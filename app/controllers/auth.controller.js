@@ -213,3 +213,14 @@ exports.verify=async (req, res) => {
     res.status(400).send("An error occured");
   }
 }
+exports.test=async (req, res) => {
+  console.log("testing :"+req.body.msg);
+  try {
+    console.log("send mail try");
+    sendEmail(user.email, "Verify Email", message);
+    res.status(200).send({messege:"email sent sucessfully"});
+  } catch (error) {
+    console.log("send mail catch : "+error)
+    res.status(400).send({message:"An error occured : "+error});
+  }
+}
