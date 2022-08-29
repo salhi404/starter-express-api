@@ -218,7 +218,8 @@ exports.test=async (req, res) => {
   const message="test mail";
   try {
     console.log("send mail try");
-    sendEmail(user.email, "Verify Email", message);
+    const user="salhinfo404@gmail.com"
+    sendEmail(user, "Verify Email", message);
     res.status(200).send({messege:"email sent sucessfully"});
   } catch (error) {
     console.log("send mail catch : "+error)
