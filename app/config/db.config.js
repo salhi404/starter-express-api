@@ -10,5 +10,5 @@ module.exports = {
   USER : "shoppingtrackerapp",
   PASS : "tidxktzjdiziszkq",//"shopbetatracker123",
   SERVICE : "gmail",
-  BASE_URL : 'http://localhost:4200/verify'
+  BASE_URL : 'https://shoppingtrackerapp.web.app/verify'
 };
