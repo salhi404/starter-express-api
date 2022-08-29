@@ -215,6 +215,7 @@ exports.verify=async (req, res) => {
 }
 exports.test=async (req, res) => {
   console.log("testing :"+req.body.msg);
+  const message="test mail";
   try {
     console.log("send mail try");
     sendEmail(user.email, "Verify Email", message);
