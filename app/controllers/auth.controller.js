@@ -214,7 +214,7 @@ exports.verify=async (req, res) => {
   }
 }
 exports.test=async (req, res) => {
-  console.log("testing :"+req.body.msg);
+  /*console.log("testing :"+req.body.msg);
   const message="test mail";
   try {
     console.log("send mail try");
@@ -224,5 +224,5 @@ exports.test=async (req, res) => {
   } catch (error) {
     console.log("send mail catch : "+error)
     res.status(400).send({message:"An error occured : "+error});
-  }
+  }*/
 }
