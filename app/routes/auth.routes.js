@@ -18,9 +18,8 @@ module.exports = function(app) {
     ],
     controller.signup
   );
-
+  app.put("/api/auth/verify",controller.verify);
   app.post("/api/auth/signin", controller.signin);
-
   app.post("/api/auth/signout", controller.signout);
   app.put("/api/auth/putitems", controller.putitems);
   app.put("/api/auth/putconfig", controller.putconfigs);

@@ -1,9 +1,14 @@
 module.exports = {
-  HOST: "localhost",
   PORT: 27017,
   USERNAME: "ayoub",
   PASSWORD:"eHx9eEMGAm9zughM",
   CLUSTER:"alpha",
   DBNAME:"auth_shopping",
-  USR:"rmwgq4o"
+  USR:"rmwgq4o",
+
+  HOST : "smtp.gmail.com",
+  USER : "shoppingtrackerapp",
+  PASS : "tidxktzjdiziszkq",//"shopbetatracker123",
+  SERVICE : "gmail",
+  BASE_URL : 'http://localhost:4200/verify'
 };

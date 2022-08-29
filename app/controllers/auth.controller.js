@@ -1,21 +1,24 @@
 const config = require("../config/auth.config");
+const config_mail = require("../config/db.config");
+const sendEmail = require("../utils/email");
 const db = require("../models");
+const crypto = require('crypto');
 const User = db.user;
 const Role = db.role;
-
+const Token = db.token;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const default_conf='{"id":0,"groupsName":["group 1","group 2","group 3","group 4","group 5","group 6"],"groupsIcons":[1,2,3,4,5,6],"groupsBuget":[1000,1000,1000,1000,1000,1000],"curancy":"DH","booleans":[true,true,true,true]}';
+
 exports.signup = (req, res) => {
   const user = new User({
     username: req.body.username,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 8),
     items:[],
-    configs:default_conf
+    configs:default_conf,
+    verified:false
   });
-  console.log("req.body.temp");
-  console.log(req.body.temp);
   user.save((err, user) => {
     if (err) {
       res.status(500).send({ message: err });
@@ -39,7 +42,6 @@ exports.signup = (req, res) => {
               res.status(500).send({ message: err });
               return;
             }
-
             res.send({ message: "User was registered successfully!" });
           });
         }
@@ -57,7 +59,15 @@ exports.signup = (req, res) => {
             res.status(500).send({ message: err });
             return;
           }
+          const buf = crypto.randomBytes(32); 
+         // console.log(buf.toString('hex'));
+          let token = new Token({
+            userId: user._id,
+            token: buf.toString('hex'),
+          }).save();
 
+          const message = `${config_mail.BASE_URL}/${user.id}/${buf.toString('hex')}`;
+          sendEmail(user.email, "Verify Email", message);
           res.send({ message: "User was registered successfully!" });
         });
       });
@@ -108,6 +118,7 @@ exports.signin = (req, res) => {
         items:user.items,
         configs:user.configs,
         token:token,
+        verified:user.verified,
       });
     });
 };
@@ -182,3 +193,23 @@ exports.putconfigs = async (req, res) => {
 }
 
 };
+exports.verify=async (req, res) => {
+  console.log("verifying")
+  try {
+    const user = await User.findOne({ _id: req.body.id });
+    if (!user) return res.status(400).send("Invalid link");
+
+    const token = await Token.findOne({
+      userId: req.body.id,
+      token: req.body.token,
+    });
+    if (!token) return res.status(400).send("Invalid link");
+
+    await User.updateOne({ _id: user._id, verified: true });
+    await Token.findByIdAndRemove(token._id);
+
+    res.status(200).send({messege:"email verified sucessfully"});
+  } catch (error) {
+    res.status(400).send("An error occured");
+  }
+}

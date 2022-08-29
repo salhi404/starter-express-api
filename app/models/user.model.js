@@ -13,7 +13,11 @@ const User = mongoose.model(
       }
     ],
     items: [String],
-    configs: String
+    configs: String,
+    verified: {
+      type: Boolean,
+      default: false,
+    },
   })
 );
 
