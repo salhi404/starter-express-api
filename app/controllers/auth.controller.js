@@ -205,12 +205,19 @@ exports.verify=async (req, res) => {
     });
     if (!token) return res.status(401).send({messege:"Invalid link"});
 
-    await User.updateOne({ _id: req.body.id, verified: true }); 
+    await User.updateOne({ _id: req.body.id},{verified: true }, function (err, docs) {
+      if (err){
+          console.log(err)
+      }
+      else{
+          console.log("Updated Docs : ", docs);
+      }
+  });
     await Token.findByIdAndRemove(token._id);
 
     res.status(200).send({messege:"email verified sucessfully"});
   } catch (error) {
-    res.status(402).send({messege:"An error occured"+error.toString()});
+    res.status(402).send({messege:"An error occured"});
   }
 }
 exports.test=async (req, res) => {
