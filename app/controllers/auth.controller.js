@@ -203,14 +203,7 @@ exports.verify=async (req, res) => {
       token: req.body.token,
     });
     if (!token) return res.status(400).send({messege:"Invalid link no macthed token"});
-    await User.updateOne({ _id: req.body.id},{verified: true }, function (err, docs) {
-      if (err){
-          console.log(err)
-      }
-      else{
-          console.log("Updated Docs : ", docs);
-      }
-  });
+     User.updateOne({ _id: req.body.id},{verified: true });
     await Token.findByIdAndRemove(token._id);
     res.status(200).send({messege:"email verified sucessfully"});
   } catch (error) {
