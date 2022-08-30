@@ -214,15 +214,15 @@ exports.verify=async (req, res) => {
   }
 }
 exports.test=async (req, res) => {
-  /*console.log("testing :"+req.body.msg);
+  console.log("testing :"+req.body.msg);
   const message="test mail";
   try {
     console.log("send mail try");
-    const user="salhinfo404@gmail.com"
+    const user="salhinfo404@gmail.com";
     sendEmail(user, "Verify Email", message);
     res.status(200).send({messege:"email sent sucessfully"});
   } catch (error) {
     console.log("send mail catch : "+error)
     res.status(400).send({message:"An error occured : "+error});
-  }*/
+  }
 }
