@@ -197,20 +197,20 @@ exports.verify=async (req, res) => {
   console.log("verifying")
   try {
     const user = await User.findOne({ _id: req.body.id });
-    if (!user) return res.status(400).send("Invalid link");
+    if (!user) return res.status(400).send({messege:"Invalid link"});
 
     const token = await Token.findOne({
       userId: req.body.id,
       token: req.body.token,
     });
-    if (!token) return res.status(400).send("Invalid link");
+    if (!token) return res.status(401).send({messege:"Invalid link"});
 
-    await User.updateOne({ _id: user._id, verified: true });
+    await User.updateOne({ _id: req.body.id, verified: true });
     await Token.findByIdAndRemove(token._id);
 
     res.status(200).send({messege:"email verified sucessfully"});
   } catch (error) {
-    res.status(400).send("An error occured");
+    res.status(402).send({messege:"An error occured"+error.toString()});
   }
 }
 exports.test=async (req, res) => {
@@ -223,6 +223,6 @@ exports.test=async (req, res) => {
     res.status(200).send({messege:"email sent sucessfully"});
   } catch (error) {
     console.log("send mail catch : "+error)
-    res.status(400).send({message:"An error occured : "+error});
+    res.status(403).send({message:"An error occured : "+error});
   }
 }
