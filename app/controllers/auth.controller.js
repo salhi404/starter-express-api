@@ -197,14 +197,12 @@ exports.verify=async (req, res) => {
   console.log("verifying")
   try {
     const user = await User.findOne({ _id: req.body.id });
-    if (!user) return res.status(400).send({messege:"Invalid link"});
-
+    if (!user) return res.status(400).send({messege:"Invalid link no macthed user"});
     const token = await Token.findOne({
       userId: req.body.id,
       token: req.body.token,
     });
-    if (!token) return res.status(401).send({messege:"Invalid link"});
-
+    if (!token) return res.status(400).send({messege:"Invalid link no macthed token"});
     await User.updateOne({ _id: req.body.id},{verified: true }, function (err, docs) {
       if (err){
           console.log(err)
@@ -214,10 +212,10 @@ exports.verify=async (req, res) => {
       }
   });
     await Token.findByIdAndRemove(token._id);
-
     res.status(200).send({messege:"email verified sucessfully"});
   } catch (error) {
-    res.status(402).send({messege:"An error occured"});
+    res.status(400).send({messege:"An error occured"+error.toString()});
+    console.log(error);
   }
 }
 exports.test=async (req, res) => {
