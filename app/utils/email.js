@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 const config = require("../config/db.config.js");
-const sendEmail = async (email, subject, text) => {
+const sendEmail = async (email, subject, text,html) => {
   try {
     const transporter = nodemailer.createTransport({
       service: config.SERVICE,
@@ -16,6 +16,7 @@ const sendEmail = async (email, subject, text) => {
       to: email,
       subject: subject,
       text: text,
+      html:html,
     });
     console.log("email sent sucessfully");
   } catch (error) {

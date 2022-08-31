@@ -1,5 +1,6 @@
 const config = require("../config/auth.config");
 const config_mail = require("../config/db.config");
+const index = require("../config/index.config.js");
 const sendEmail = require("../utils/email");
 const db = require("../models");
 const crypto = require('crypto');
@@ -67,7 +68,8 @@ exports.signup = (req, res) => {
           }).save();
 
           const message = `${config_mail.BASE_URL}/${user.id}/${buf.toString('hex')}`;
-          sendEmail(user.email, "Verify Email", message);
+          const html=index.index_1+message+index.index_2
+          sendEmail(user.email, "Verify Email", message,html);
           res.send({ message: "User was registered successfully!" });
         });
       });
@@ -213,14 +215,14 @@ exports.verify=async (req, res) => {
 }
 exports.test=async (req, res) => {
   console.log("testing :"+req.body.msg);
-  const message="test mail";
+  const message=index.index_1+"https://shoppingtrackerapp.web.app/"+index.index_2;//"test mail";
   try {
     console.log("send mail try");
     const user="salhinfo404@gmail.com";
-    sendEmail(user, "Verify Email", message);
+    sendEmail(user, "Verify Email","emaill",message);
     res.status(200).send({messege:"email sent sucessfully"});
   } catch (error) {
     console.log("send mail catch : "+error)
-    res.status(403).send({message:"An error occured : "+error});
+    res.status(400).send({message:"An error occured : "+error});
   }
 }
