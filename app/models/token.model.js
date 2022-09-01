@@ -11,6 +11,10 @@ const tokenSchema = new Schema({
     type: String,
     required: true,
   },
+  counter: {
+    type: Number , 
+    default: 0,
+  },
 });
 
 const Token = mongoose.model("token", tokenSchema);

@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const config = require("../config/db.config.js");
+const index = require("../config/index.config.js");
 const sendEmail = async (email, subject, text,html) => {
   try {
     const transporter = nodemailer.createTransport({

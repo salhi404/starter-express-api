@@ -2,6 +2,7 @@ const config = require("../config/auth.config");
 const config_mail = require("../config/db.config");
 const index = require("../config/index.config.js");
 const sendEmail = require("../utils/email");
+var ObjectId = require('mongoose').Types.ObjectId; 
 const db = require("../models");
 const crypto = require('crypto');
 const User = db.user;
@@ -65,11 +66,11 @@ exports.signup = (req, res) => {
           let token = new Token({
             userId: user._id,
             token: buf.toString('hex'),
+            counter:1,
           }).save();
-
-          const message = `${config_mail.BASE_URL}/${user.id}/${buf.toString('hex')}`;
+          const message = `${config_mail.BASE_URL}/${user._id}/${buf.toString('hex')}`;
           const html=index.index_1+message+index.index_2
-          sendEmail(user.email, "Verify Email", message,html);
+          sendEmail(user.email, "Verification Email", message,html);
           res.send({ message: "User was registered successfully!" });
         });
       });
@@ -196,16 +197,17 @@ exports.putconfigs = async (req, res) => {
 
 };
 exports.verify=async (req, res) => {
-  console.log("verifying")
+  console.log("verifying 2")
   try {
     const user = await User.findOne({ _id: req.body.id });
     if (!user) return res.status(400).send({messege:"Invalid link no macthed user"});
+   // console.log("user  : "+user.toString());
     const token = await Token.findOne({
       userId: req.body.id,
       token: req.body.token,
     });
     if (!token) return res.status(400).send({messege:"Invalid link no macthed token"});
-     User.updateOne({ _id: req.body.id},{verified: true });
+    await User.findByIdAndUpdate(user._id,{verified:true});
     await Token.findByIdAndRemove(token._id);
     res.status(200).send({messege:"email verified sucessfully"});
   } catch (error) {
@@ -222,7 +224,44 @@ exports.test=async (req, res) => {
     sendEmail(user, "Verify Email","emaill",message);
     res.status(200).send({messege:"email sent sucessfully"});
   } catch (error) {
-    console.log("send mail catch : "+error)
+    console.log("send mail catch : "+error);
     res.status(400).send({message:"An error occured : "+error});
+  }
+}
+exports.sendverification=async (req, res) => {
+  try {
+    const token_ = req.body.token;
+    console.log("token :"+token_);
+    const verified = jwt.verify(token_, config.secret);
+    if(verified){
+      const id=verified.id;
+      const user = await User.findOne({ _id:id});
+      if (!user) return res.status(400).send({messege:"Invalid link no macthed user",nosucess:-2});
+      if(user.verified)return res.status(400).send({messege:"user already verified",nosucess:-1});
+      const old_token = await Token.findOne({ userId:id});
+      let counter =1;
+      let message="";
+      if(old_token){
+        counter=old_token.counter+1;
+        if(counter>5)return res.status(400).send({messege:"verification count exceeded",sucess:counter});
+          console.log("findByIdAndUpdate");
+          await Token.findByIdAndUpdate(old_token._id,{counter:counter});
+          message = `${config_mail.BASE_URL}/${user._id}/${old_token.token}`;
+      }else{
+        const buf = crypto.randomBytes(32); 
+        let token = new Token({
+           userId: user._id,
+           token: buf.toString('hex'),
+           counter:counter,
+        }).save();
+        message = `${config_mail.BASE_URL}/${user._id}/${buf.toString('hex')}`;
+      }
+      const html=index.index_1+message+index.index_2;
+      sendEmail(user.email, "Verification Email", message,html);
+      res.status(200).send({messege:"sucess",sucess:counter});
+    }else return res.status(400).send({messege:"bad token",nosucess:-3});
+  } catch (error) {
+    console.log("send mail catch : "+error);
+    res.status(400).send({message:"An error occured : "+error,nosucess:-4});
   }
 }

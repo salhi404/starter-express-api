@@ -24,4 +24,5 @@ module.exports = function(app) {
   app.post("/api/auth/signout", controller.signout);
   app.put("/api/auth/putitems", controller.putitems);
   app.put("/api/auth/putconfig", controller.putconfigs);
+  app.put("/api/auth/sendverification", controller.sendverification);
 };
