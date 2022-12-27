@@ -5,7 +5,7 @@ const config = require("./token.config");
 const dbConfig = require("./app/config/db.config");
 const app = express();
 
-var whitelist = [/*'http://192.168.1.101:4200','http://localhost:4200', */'https://elearnappsite.web.app', 'https://shoppingtrackerapp.web.app']
+var whitelist = ['http://192.168.1.101:4200','http://localhost:4200', 'https://elearnappsite.web.app']
 var  origin= function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true)
@@ -64,7 +64,7 @@ require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
+const PORT =8080 /*process.env.PORT ||*/ ;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
