@@ -7,8 +7,8 @@ module.exports = {
   USR:"rmwgq4o",
 
   HOST : "smtp.gmail.com",
-  USER : "shoppingtrackerapp",
-  PASS : "tidxktzjdiziszkq",//"shopbetatracker123",
+  USER : "elearnapp404",//shoppingtrackerapp
+  PASS : "elearnpass123",//"shopbetatracker123",
   SERVICE : "gmail",
   BASE_URL : 'https://shoppingtrackerapp.web.app/verify'
   //BASE_URL : 'http://localhost:4200/verify'

@@ -5,7 +5,7 @@ const config = require("./token.config");
 const dbConfig = require("./app/config/db.config");
 const app = express();
 
-var whitelist = ['http://localhost:4200', 'https://shoppingtrackerapp.web.app']
+var whitelist = ['http://192.168.1.101:4200','http://localhost:4200', 'https://shoppingtrackerapp.web.app']
 var  origin= function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true)
@@ -36,11 +36,11 @@ app.use(
 
 const db = require("./app/models");
 const Role = db.role;
-
+//mongodb+srv://ayoub:<password>@alpha.rmwgq4o.mongodb.net/?retryWrites=true&w=majority
 db.mongoose
 .connect(
-  `mongodb+srv://${dbConfig.USERNAME}:${dbConfig.PASSWORD}@${dbConfig.CLUSTER}.${dbConfig.USR}.mongodb.net/${dbConfig.DBNAME}?retryWrites=true&w=majority`, 
-  {
+ `mongodb+srv://ayoub:${dbConfig.PASSWORD}@${dbConfig.CLUSTER}.${dbConfig.USR}.mongodb.net/${dbConfig.DBNAME}?retryWrites=true&w=majority`,
+ {
     useNewUrlParser: true,
     useUnifiedTopology: true
   }
