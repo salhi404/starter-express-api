@@ -5,7 +5,7 @@ const config = require("./token.config");
 const dbConfig = require("./app/config/db.config");
 const app = express();
 
-var whitelist = [/*'http://192.168.1.101:4200','http://localhost:4200', */'http://elearnappsite.web.app', 'https://shoppingtrackerapp.web.app']
+var whitelist = [/*'http://192.168.1.101:4200','http://localhost:4200', */'https://elearnappsite.web.app', 'https://shoppingtrackerapp.web.app']
 var  origin= function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true)
