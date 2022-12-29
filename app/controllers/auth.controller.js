@@ -8,16 +8,17 @@ const crypto = require('crypto');
 const User = db.user;
 const Role = db.role;
 const Token = db.token;
+const Mail = db.mail;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
-const default_conf='{"id":0,"groupsName":["group 1","group 2","group 3","group 4","group 5","group 6"],"groupsIcons":[1,2,3,4,5,6],"groupsBuget":[1000,1000,1000,1000,1000,1000],"curancy":"DH","booleans":[true,true,true,true]}';
+const default_conf='{"id":0,"placeholder":["1","2","3"],}';
 
 exports.signup = (req, res) => {
   const user = new User({
     username: req.body.username,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 8),
-    items:[],
+    //items:[],
     configs:default_conf,
     verified:false
   });
@@ -26,7 +27,6 @@ exports.signup = (req, res) => {
       res.status(500).send({ message: err });
       return;
     }
-
     if (req.body.roles) {
       Role.find(
         {
@@ -37,7 +37,6 @@ exports.signup = (req, res) => {
             res.status(500).send({ message: err });
             return;
           }
-
           user.roles = roles.map((role) => role._id);
           user.save((err) => {
             if (err) {
@@ -54,7 +53,6 @@ exports.signup = (req, res) => {
           res.status(500).send({ message: err });
           return;
         }
-
         user.roles = [role._id];
         user.save((err) => {
           if (err) {
@@ -118,7 +116,6 @@ exports.signin = (req, res) => {
         username: user.username,
         email: user.email,
         roles: authorities,
-        items:user.items,
         configs:user.configs,
         token:token,
         verified:user.verified,
@@ -134,67 +131,6 @@ exports.signout = async (req, res) => {
   } catch (err) {
     this.next(err);
   }
-};
-exports.putitems = async (req, res) => {
-  try {
-    const token = req.body.token;
-    console.log("token");
-    console.log(token);
-    const verified = jwt.verify(token, config.secret);
-    const items=req.body.items;
-    if(verified){
-      const id=verified.id;
-      User.findByIdAndUpdate(id, { items: items },
-        function (err, docs) {
-          if (err){
-              console.log(err)
-          }
-          else{
-              console.log("Updated User : ", docs);
-          }
-        });
-      return res.send({ message: "Successfully Verified" });
-    }else{
-        // Access Denied
-        return res.status(401).send({ message: "Access Denied" });
-    }
-} catch (error) {
-    // Access Denied
-    console.log("error   "+error);
-    return res.status(401).send(error);
-
-}
-
-};
-exports.putconfigs = async (req, res) => {
-  try {
-    const token = req.body.token;
-    //console.log(token);
-    const verified = jwt.verify(token, config.secret);
-    const configs=req.body.configs;
-    if(verified){
-      const id=verified.id;
-      User.findByIdAndUpdate(id, { configs: configs },
-        function (err, docs) {
-          if (err){
-              console.log(err)
-          }
-          else{
-              console.log("Updated User : ", docs);
-          }
-        });
-      return res.send({ message: "Successfully Verified" });
-    }else{
-        // Access Denied
-        return res.status(401).send({ message: "Access Denied" });
-    }
-} catch (error) {
-    // Access Denied
-    console.log("error   "+error);
-    return res.status(401).send(error);
-
-}
-
 };
 exports.verify=async (req, res) => {
   console.log("verifying 2")
@@ -213,19 +149,6 @@ exports.verify=async (req, res) => {
   } catch (error) {
     res.status(400).send({messege:"An error occured"+error.toString()});
     console.log(error);
-  }
-}
-exports.test=async (req, res) => {
-  console.log("testing :"+req.body.msg);
-  const message=index.index_1+"https://shoppingtrackerapp.web.app/"+index.index_2;//"test mail";
-  try {
-    console.log("send mail try");
-    const user="salhinfo404@gmail.com";
-    sendEmail(user, "Verify Email","emaill",message);
-    res.status(200).send({messege:"email sent sucessfully"});
-  } catch (error) {
-    console.log("send mail catch : "+error);
-    res.status(400).send({message:"An error occured : "+error});
   }
 }
 exports.sendverification=async (req, res) => {
