@@ -13,6 +13,8 @@ const mailSchema = new Schema({
     ref: "user",
     required: true,
   },
+  fromToUserName:String,
+  fromToMail:String,
   date: { type: Date, default: Date.now },
   subject:String,
   body:String,

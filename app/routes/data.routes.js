@@ -7,6 +7,7 @@ module.exports = function(app) {
     );
     next();
   });
+  app.post("/api/data/getmail", controller.getmail);
   app.post("/api/data/sendmail", controller.sendmail);
   app.post("/api/data/test", controller.test);
   app.put("/api/data/putitems", controller.putitems);

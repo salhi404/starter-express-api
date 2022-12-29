@@ -40,6 +40,8 @@ exports.sendmail= (req, res) => {
                         userId: user1._id,
                         isSent: true,
                         fromTo:user._id,
+                        fromToUserName:user.username,
+                        fromToMail:user.email,
                         subject:rmail.subject,
                         body:rmail.body,
                         tags:["sent"]
@@ -52,6 +54,8 @@ exports.sendmail= (req, res) => {
                             userId: user._id,
                             isSent: false,
                             fromTo:user1._id,
+                            fromToUserName:user1.username,
+                            fromToMail:user1.email,
                             subject:rmail.subject,
                             body:rmail.body,
                             tags:["inbox"]
@@ -75,7 +79,34 @@ exports.sendmail= (req, res) => {
     
     }
   };
-  
+  exports.getmail= (req, res) => {
+    try {
+        const token = req.body.token;
+        console.log("token");
+        console.log(token);
+        const verified = jwt.verify(token, config.secret);
+        if(verified){
+            const id=verified.id;
+            Mail.find({userId:id}, (err, mails) => {
+            if (err) {
+              res.status(500).send({ message: err });
+              return;
+            }
+            console.log("mails");
+            console.log(mails);
+            res.status(200).send(mails);
+          });
+        }else{
+            // Access Denied
+            return res.status(401).send({ message: "Access Denied" });
+        }
+    } catch (error) {
+        // Access Denied
+        console.log("error   "+error);
+        return res.status(401).send(error);
+    
+    }
+  };
 exports.putitems = async (req, res) => {
     try {
       const token = req.body.token;
