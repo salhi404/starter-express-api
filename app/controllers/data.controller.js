@@ -34,7 +34,13 @@ exports.sendmail= (req, res) => {
                       return;
                     }
                     if (!user) {
-                        return res.status(404).send({ message: "email provided Not found." });
+                        return res.status(400).send({ message: "email provided Not found." });
+                    }
+                    
+                    if(user1._id.equals(user._id))
+                    {
+                        return res.status(400).send({ message: "choose an acount outher than yours." });
+                        //console.log("same user");
                     }
                     let mail1 = new Mail({
                         userId: user1._id,
@@ -64,10 +70,10 @@ exports.sendmail= (req, res) => {
                               res.status(500).send({ message: err });
                               return;
                             }});
+                            return res.send({ message: "email sent Successfully " });
                   });
             }
           });
-          return res.send({ message: "email sent Successfully " });
         }else{
             // Access Denied
             return res.status(401).send({ message: "Access Denied" });
@@ -82,8 +88,6 @@ exports.sendmail= (req, res) => {
   exports.getmail= (req, res) => {
     try {
         const token = req.body.token;
-        console.log("token");
-        console.log(token);
         const verified = jwt.verify(token, config.secret);
         if(verified){
             const id=verified.id;
@@ -92,8 +96,6 @@ exports.sendmail= (req, res) => {
               res.status(500).send({ message: err });
               return;
             }
-            console.log("mails");
-            console.log(mails);
             res.status(200).send(mails);
           });
         }else{
