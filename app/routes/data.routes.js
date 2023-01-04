@@ -11,5 +11,5 @@ module.exports = function(app) {
   app.post("/api/data/sendmail", controller.sendmail);
   app.post("/api/data/test", controller.test);
   app.put("/api/data/putitems", controller.putitems);
-  app.put("/api/data/putconfig", controller.putconfigs);
+  app.post("/api/data/sendPref", controller.sendPref);
 };

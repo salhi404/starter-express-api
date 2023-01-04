@@ -138,15 +138,15 @@ exports.putitems = async (req, res) => {
   }
   
   };
-  exports.putconfigs = async (req, res) => {
+  exports.sendPref = async (req, res) => {
     try {
       const token = req.body.token;
       //console.log(token);
       const verified = jwt.verify(token, config.secret);
-      const configs=req.body.configs;
+      const pref=req.body.pref;
       if(verified){
         const id=verified.id;
-        User.findByIdAndUpdate(id, { configs: configs },
+        User.findByIdAndUpdate(id, { configs: JSON.stringify(pref) },
           function (err, docs) {
             if (err){
                 console.log(err)
@@ -155,7 +155,7 @@ exports.putitems = async (req, res) => {
                 console.log("Updated User : ", docs);
             }
           });
-        return res.send({ message: "Successfully Verified" });
+        return res.send({ message: "pref Successfully Updated " });
       }else{
           // Access Denied
           return res.status(401).send({ message: "Access Denied" });
