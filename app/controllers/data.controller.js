@@ -53,8 +53,7 @@ exports.sendmail= (req, res) => {
                         tags:["sent"]
                       }).save((err) => {
                         if (err) {
-                          res.status(500).send({ message: err });
-                          return;
+                          return res.status(500).send({ message: err });
                         }});
                         let mail2 = new Mail({
                             userId: user._id,
@@ -67,8 +66,7 @@ exports.sendmail= (req, res) => {
                             tags:["inbox"]
                           }).save((err) => {
                             if (err) {
-                              res.status(500).send({ message: err });
-                              return;
+                              return res.status(500).send({ message: err });
                             }});
                             return res.send({ message: "email sent Successfully " });
                   });
@@ -93,8 +91,7 @@ exports.sendmail= (req, res) => {
             const id=verified.id;
             Mail.find({userId:id}, (err, mails) => {
             if (err) {
-              res.status(500).send({ message: err });
-              return;
+              return res.status(500).send({ message: err });
             }
             res.status(200).send(mails);
           });
