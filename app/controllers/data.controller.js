@@ -21,8 +21,7 @@ exports.sendmail = (req, res) => {
       const id = verified.id;
       User.findOne({ _id: id }, (err, user1) => {
         if (err) {
-          res.status(500).send({ message: err });
-          return;
+          return res.status(500).send({ message: err });
         }
         if (!user1) {
           return res.status(405).send({ message: "dev/ user not found send mail" });
@@ -49,7 +48,8 @@ exports.sendmail = (req, res) => {
               subject: rmail.subject,
               body: rmail.body,
               tags: ["sent"]
-            }).save((err) => {
+            });
+            mail1.save((err) => {
               if (err) {
                 return res.status(500).send({ message: err });
               }
@@ -64,7 +64,8 @@ exports.sendmail = (req, res) => {
               subject: rmail.subject,
               body: rmail.body,
               tags: ["inbox"]
-            }).save((err) => {
+            });
+            mail2.save((err) => {
               if (err) {
                 return res.status(500).send({ message: err });
               }
