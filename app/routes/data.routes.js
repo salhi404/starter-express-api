@@ -9,7 +9,9 @@ module.exports = function(app) {
   });
   app.post("/api/data/getmail", controller.getmail);
   app.post("/api/data/sendmail", controller.sendmail);
+  app.post("/api/data/deletemail", controller.deletemail);
+  app.post("/api/data/syncmailtags", controller.syncmailtags);
   app.post("/api/data/test", controller.test);
-  app.put("/api/data/putitems", controller.putitems);
+  //app.put("/api/data/putitems", controller.putitems);
   app.post("/api/data/sendPref", controller.sendPref);
 };

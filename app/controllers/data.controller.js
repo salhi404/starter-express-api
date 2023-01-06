@@ -138,6 +138,75 @@ exports.putitems = async (req, res) => {
   }
   
   };
+  exports.syncmailtags=async (req, res) => {
+    try {
+      const token = req.body.token;
+      const verified = jwt.verify(token, config.secret);
+      const tags=req.body.tags;
+      
+      if(verified){
+        const id=verified.id;
+        tags.forEach(element => {
+          console.log("recieved tags");
+          console.log(element);
+          Mail.findByIdAndUpdate(element.mailId, { tags: element.tag },
+            function (err, docs) {
+              if (err){
+                  console.log(err)
+              }
+              else{
+                  console.log("Updated Mail : ", docs);
+              }
+            });
+        });
+        
+        return res.send({ message: "Successfully Updated" });
+      }else{
+          // Access Denied
+          return res.status(401).send({ message: "Access Denied" });
+      }
+  } catch (error) {
+      // Access Denied
+      console.log("error   "+error);
+      return res.status(401).send(error);
+  
+  }
+  
+  };
+  exports.deletemail=async (req, res) => {
+    try {
+      const token = req.body.token;
+      const verified = jwt.verify(token, config.secret);
+      const mails=req.body.mails;
+      if(verified){
+        const id=verified.id;
+        mails.forEach(element => {
+          console.log("recieved tags");
+          console.log(element);
+          Mail.deleteOne({ _id:element },
+            function (err, docs) {
+              if (err){
+                  console.log(err)
+              }
+              else{
+                  console.log("Updated Mail : ", docs);
+              }
+            });
+        });
+        
+        return res.send({ message: "Successfully Updated" });
+      }else{
+          // Access Denied
+          return res.status(401).send({ message: "Access Denied" });
+      }
+  } catch (error) {
+      // Access Denied
+      console.log("error   "+error);
+      return res.status(401).send(error);
+  
+  }
+  
+  };
   exports.sendPref = async (req, res) => {
     try {
       const token = req.body.token;
