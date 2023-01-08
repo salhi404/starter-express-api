@@ -15,7 +15,7 @@ const User = mongoose.model(
     //items: [String],
     configs: String,
     verified: Boolean,
-
+    mailUpdate:{type:Number,default:0}
   })
 );
 

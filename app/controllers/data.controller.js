@@ -39,6 +39,18 @@ exports.sendmail = (req, res) => {
               return res.status(400).send({ message: "choose an acount outher than yours." });
               //console.log("same user");
             }
+            user.mailUpdate++;
+            const mailUpdate = user1.mailUpdate++;
+            user.save((err) => {
+              if (err) {
+                return res.status(500).send({ message: err });
+              }
+            });
+            user1.save((err) => {
+              if (err) {
+                return res.status(500).send({ message: err });
+              }
+            });
             let mail1 = new Mail({
               userId: user1._id,
               isSent: true,
@@ -52,7 +64,7 @@ exports.sendmail = (req, res) => {
             });
             mail1.save((err) => {
               if (err) {
-                return res.status(500).send({ message: err });
+                return res.status(500).send({ message: err ,mailUpdate:mailUpdate});
               }
             });
 
@@ -72,7 +84,7 @@ exports.sendmail = (req, res) => {
                 return res.status(500).send({ message: err });
               }
             });
-            return res.status(200).send({ message: "email sent Successfully " });
+            return res.status(200).send({ message: "email sent Successfully ", });
           });
         }
       });
@@ -98,6 +110,32 @@ exports.getmail = (req, res) => {
           return res.status(500).send({ message: err });
         }
         res.status(200).send(mails);
+      });
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error) {
+    // Access Denied
+    console.log("error   " + error);
+    return res.status(401).send(error);
+
+  }
+};
+exports.getmailupdate = (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findById(id,(err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        console.log("user.mailUpdate");
+        console.log(user.mailUpdate);
+        
+        return res.status(200).send({code:0});
       });
     } else {
       // Access Denied
