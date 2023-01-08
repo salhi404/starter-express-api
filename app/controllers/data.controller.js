@@ -135,7 +135,7 @@ exports.getmailupdate = (req, res) => {
         console.log("user.mailUpdate");
         console.log(user.mailUpdate);
         
-        return res.status(200).send({code:0});
+        return res.status(200).send({code:user.mailUpdate});
       });
     } else {
       // Access Denied
