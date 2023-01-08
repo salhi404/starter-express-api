@@ -18,7 +18,8 @@ const mailSchema = new Schema({
   date: { type: Date, default: Date.now },
   subject:String,
   body:String,
-  tags:[String]
+  tags:[String],
+  label:{ type: Number, default: -1 }
 });
 
 const mail = mongoose.model("mail", mailSchema);

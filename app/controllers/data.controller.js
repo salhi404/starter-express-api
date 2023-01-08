@@ -47,7 +47,8 @@ exports.sendmail = (req, res) => {
               fromToMail: user.email,
               subject: rmail.subject,
               body: rmail.body,
-              tags: ["sent"]
+              tags: ["sent"],
+              label:rmail.label
             });
             mail1.save((err) => {
               if (err) {
@@ -63,7 +64,8 @@ exports.sendmail = (req, res) => {
               fromToMail: user1.email,
               subject: rmail.subject,
               body: rmail.body,
-              tags: ["inbox"]
+              tags: ["inbox"],
+              label:rmail.label
             });
             mail2.save((err) => {
               if (err) {
