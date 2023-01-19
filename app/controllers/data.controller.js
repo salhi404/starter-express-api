@@ -155,8 +155,8 @@ exports.getmailupdate = (req, res) => {
         if (err) {
           return res.status(500).send({ message: err });
         }
-        console.log("user.mailUpdate");
-        console.log(user.mailUpdate);
+        /*console.log("user.mailUpdate");
+        console.log(user.mailUpdate);*/
         
         return res.status(200).send({code:user.mailUpdate});
       });
@@ -184,7 +184,7 @@ exports.putitems = async (req, res) => {
             console.log(err)
           }
           else {
-            console.log("Updated User : ", docs);
+            //console.log("Updated User : ", docs);
           }
         });
       return res.send({ message: "Successfully Verified" });
@@ -283,7 +283,7 @@ exports.sendPref = async (req, res) => {
             console.log(err)
           }
           else {
-            console.log("Updated User : ", docs);
+            /*console.log("Updated User : ", docs);*/
           }
         });
       return res.send({ message: "pref Successfully Updated " });

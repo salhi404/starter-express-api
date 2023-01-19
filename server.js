@@ -4,6 +4,7 @@ const cookieSession = require("cookie-session");
 const config = require("./token.config");
 const dbConfig = require("./app/config/db.config");
 const app = express();
+const http = require('http').createServer(app);
 
 var whitelist = ['http://192.168.1.102:4200','http://localhost:4200', 'https://elearnappsite.web.app'/*,'https://elearnappsite.firebaseapp.com'*/,"https://elearnappsite.vercel.app"];
 var  origin= function (origin, callback) {
@@ -17,7 +18,21 @@ var corsOptions = {
   origin: origin,
   credentials:true,
 };
-
+const io = require('socket.io')(http, {
+  cors: {
+    origins: corsOptions
+  }
+});
+io.on('connection', (socket) => {
+  let token = socket.handshake.auth.token;
+  console.log('a user connected'+new Date().getTime());
+  socket.on('disconnect', () => {
+    console.log('user disconnected'+new Date().getTime());
+  });
+  socket.on('my message', (msg) => {
+    console.log('message: ' + msg);
+  });
+});
 app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
@@ -66,7 +81,7 @@ require("./app/routes/data.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000 ;
-app.listen(PORT, () => {
+http.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
 
