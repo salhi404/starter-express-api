@@ -23,16 +23,7 @@ const io = require('socket.io')(http, {
     origins: corsOptions
   }
 });
-io.on('connection', (socket) => {
-  let token = socket.handshake.auth.token;
-  console.log('a user connected'+new Date().getTime());
-  socket.on('disconnect', () => {
-    console.log('user disconnected'+new Date().getTime());
-  });
-  socket.on('my message', (msg) => {
-    console.log('message: ' + msg);
-  });
-});
+require("./app/routes/socket.routes")(io);
 app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
