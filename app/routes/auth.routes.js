@@ -20,6 +20,7 @@ module.exports = function(app) {
   );
   app.put("/api/auth/verify",controller.verify);
   app.post("/api/auth/signin", controller.signin);
+  app.post("/api/auth/verifymail", controller.verifymail);
   app.post("/api/auth/signout", controller.signout);
   app.put("/api/auth/sendverification", controller.sendverification);
 };
