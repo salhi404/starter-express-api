@@ -20,7 +20,7 @@ var corsOptions = {
 };
 const io = require('socket.io')(http, {
   cors: {
-    origins: "https://elearnappsite.vercel.app"
+    origins:["https://elearnappsite.vercel.app"] 
   }
 });
 require("./app/routes/socket.routes")(io);
