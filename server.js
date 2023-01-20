@@ -20,7 +20,7 @@ var corsOptions = {
 };
 const io = require('socket.io')(http, {
   cors: {
-    origins: corsOptions
+    origins: whitelist
   }
 });
 require("./app/routes/socket.routes")(io);
