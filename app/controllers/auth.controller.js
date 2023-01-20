@@ -117,6 +117,7 @@ exports.signin = (req, res) => {
         email: user.email,
         roles: authorities,
         configs:user.configs,
+        contacts:user.contacts,
         token:token,
         verified:user.verified,
       });

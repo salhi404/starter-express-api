@@ -8,6 +8,8 @@ module.exports = function(app) {
     next();
   });
   app.post("/api/data/getmail", controller.getmail);
+  app.post("/api/data/getchatlog", controller.getchatLog);
+  app.post("/api/data/putcontacts", controller.putcontacts);
   app.post("/api/data/getunoppenedmail", controller.getunoppenedmail);
   app.post("/api/data/getmailupdate", controller.getmailupdate);
   app.post("/api/data/sendmail", controller.sendmail);

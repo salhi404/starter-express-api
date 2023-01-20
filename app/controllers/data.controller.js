@@ -9,6 +9,7 @@ const User = db.user;
 const Role = db.role;
 const Token = db.token;
 const Mail = db.mail;
+const chatLog = db.chatLog;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
@@ -121,7 +122,52 @@ exports.getmail = (req, res) => {
     return res.status(401).send(error);
 
   }
-};  
+};
+
+
+/*PersonModel.update(
+  { _id: person._id }, 
+  { $push: { friends: friend } },
+  done
+);*/
+
+exports.getchatLog = (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if(!user){
+          return res.status(561).send({ message: "user not found" });
+        }
+        const fromToEmail = req.body.fromTo;
+        chatLog.findOne({ owner: user.email,fromTo:fromToEmail }, (err, chatlogs) => {
+          if (err) {
+            return res.status(500).send({ message: err });
+          }
+          if(chatlogs){
+            console.log("chatlogs");
+            console.log(chatlogs);
+            return res.status(200).send(chatlogs.chat);
+          }
+          return res.status(200).send([]);
+        });
+      });
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error) {
+    // Access Denied
+    console.log("error   " + error);
+    return res.status(401).send(error);
+
+  }
+}; 
 exports.getunoppenedmail = (req, res) => {
   try {
     const token = req.body.token;
@@ -181,7 +227,7 @@ exports.putitems = async (req, res) => {
       User.findByIdAndUpdate(id, { items: items },
         function (err, docs) {
           if (err) {
-            console.log(err)
+            return res.status(500).send({ message: err });
           }
           else {
             //console.log("Updated User : ", docs);
@@ -196,9 +242,34 @@ exports.putitems = async (req, res) => {
     // Access Denied
     console.log("error   " + error);
     return res.status(401).send(error);
-
   }
-
+};
+exports.putcontacts = async (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    const contacts = req.body.contacts;
+    if (verified) {
+      const id = verified.id;
+      User.findByIdAndUpdate(id, { contacts: contacts },
+        function (err, docs) {
+          if (err) {
+            return res.status(500).send({ message: err });
+          }
+          else {
+            console.log("Updated User contacts : ", docs);
+          }
+        });
+      return res.send({ message: "contacts Successfully updated" });
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error) {
+    // Access Denied
+    console.log("error   " + error);
+    return res.status(401).send(error);
+  }
 };
 exports.syncmailtags = async (req, res) => {
   try {
@@ -229,7 +300,7 @@ exports.syncmailtags = async (req, res) => {
     }
   } catch (error) {
     // Access Denied
-    console.log("error   " + error);
+    console.log("error" + error);
     return res.status(401).send(error);
 
   }

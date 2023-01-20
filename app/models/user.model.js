@@ -12,7 +12,7 @@ const User = mongoose.model(
         ref: "Role"
       }
     ],
-    //items: [String],
+    contacts:{type:[],default:[]},
     configs: String,
     verified: Boolean,
     mailUpdate:{type:Number,default:0}
