@@ -15,12 +15,12 @@ var  origin= function (origin, callback) {
     }
   };
 var corsOptions = {
-  origin: "https://elearnappsite.vercel.app",
+  origin: origin,
   credentials:true,
 };
 const io = require('socket.io')(http, {
   cors: {
-    origins: whitelist
+    origins: "https://elearnappsite.vercel.app"
   }
 });
 require("./app/routes/socket.routes")(io);
