@@ -5,7 +5,7 @@ const config = require("./token.config");
 const dbConfig = require("./app/config/db.config");
 const app = express();
 
-var whitelist = ['http://192.168.1.102:4200','http://localhost:4200', 'https://elearnappsite.web.app'/*,'https://elearnappsite.firebaseapp.com'*/,"https://elearnappsite.vercel.app"];
+var whitelist = ['http://192.168.1.102:4200','http://localhost:4200', 'https://elearnappsite.web.app','https://elearn-avm2.onrender.com/',"https://elearnappsite.vercel.app"];
 var  origin= function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true)
@@ -72,7 +72,7 @@ const server =app.listen(PORT, () => {
 });
 const io = require('socket.io')(server, {
   cors: {
-    origins: ["https://elearnappsite.vercel.app"], 
+    origins: ["https://elearn-avm2.onrender.com"], 
   }
 });
 require("./app/routes/socket.routes")(io);
