@@ -15,7 +15,7 @@ var  origin= function (origin, callback) {
     }
   };
 var corsOptions = {
-  origin: origin,
+  origin: "https://elearnappsite.vercel.app",
   credentials:true,
 };
 const io = require('socket.io')(http, {
