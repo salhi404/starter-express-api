@@ -24,33 +24,30 @@ exports.disconnecte= (user,io) =>{
       });
       if(!connected.includes(user)){
         data.findOne(
-          { key: 'disconnected'},function (err, docs) {
-            if (err){
-                console.log(err)
-            }
-            else{
-                console.log("Updated Docs : ", docs);
-                if(!docs){
-                  let newdata = new data({
-                    key:'disconnected',
-                    value:[{user:user,at:new Date(Date.now()-15000)}]
-                  });
-                  newdata.save((err) => {
-                    if (err) {
-                      return res.status(500).send({ message: err });
-                    }
-                  });
-                }else{
-                  if(data.value.filter(e=>e.user==user).lenght>0){
-                    data.value.push({user:user,at:new Date(Date.now()-15000)})
-                    data.save((err)=>{console.log(err);})
-                  }
+          { key: 'disconnected'}
+      ).then(docs=> {
+            console.log("Updated Docs : ", docs);
+            if(!docs){
+              let newdata = new data({
+                key:'disconnected',
+                value:[{user:user,at:new Date(Date.now()-1500)}]
+              });
+              newdata.save((err) => {
+                if (err) {
+                  return res.status(500).send({ message: err });
                 }
+              });
+            }else{
+              docs.value=docs.value.filter(e=>e.user!=user);
+              docs.value.push({user:user,at:new Date(Date.now()-1500)});
+              docs.save((err)=>{console.log(err)});
             }
-        }
-      );
+    }).catch(err => {
+      console.log('Oh! Dark');
+      console.log(err);
+    });
       }
-    }, 15000);
+    }, 1500);
   };
  
 }

@@ -75,6 +75,7 @@ const io = require('socket.io')(server, {
     origins: ["https://elearnappsite.vercel.app"], 
   }
 });
+require("./app/routes/info.routes")(app,io);
 require("./app/routes/socket.routes")(io);
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
