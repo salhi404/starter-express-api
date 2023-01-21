@@ -6,11 +6,53 @@ var ObjectId = require('mongoose').Types.ObjectId;
 const db = require("../models");
 const crypto = require('crypto');
 const chatLog = db.chatLog;
+const data = db.data;
+const user = db.user;
 const Token = db.token;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
-exports.disconnecte=() => {
-  console.log('user disconnected'+new Date().getTime());
+const { array } = require("mongoose/lib/utils");
+exports.disconnecte= (user,io) =>{
+  return function(){
+    console.log('user disconnected'+new Date());
+    setTimeout(() => {
+      var connected=[];
+      io.sockets.adapter.sids.forEach(element => {
+        element.forEach(room => {
+          connected.push(room);
+        });
+      });
+      if(!connected.includes(user)){
+        data.findOne(
+          { key: 'disconnected'},function (err, docs) {
+            if (err){
+                console.log(err)
+            }
+            else{
+                console.log("Updated Docs : ", docs);
+                if(!docs){
+                  let newdata = new data({
+                    key:'disconnected',
+                    value:[{user:user,at:new Date(Date.now()-15000)}]
+                  });
+                  newdata.save((err) => {
+                    if (err) {
+                      return res.status(500).send({ message: err });
+                    }
+                  });
+                }else{
+                  if(data.value.filter(e=>e.user==user).lenght>0){
+                    data.value.push({user:user,at:new Date(Date.now()-15000)})
+                    data.save((err)=>{console.log(err);})
+                  }
+                }
+            }
+        }
+      );
+      }
+    }, 15000);
+  };
+ 
 }
 exports.message=(msg) => {
   console.log('message: ' + msg);
@@ -69,3 +111,22 @@ chatLog.updateOne(
 }
 );
 }
+/*function Connecte(user) {
+    data.findOne({ key:'disconnected'},function (err, docs) {
+        if (err){
+            console.log(err)
+        }
+        else{
+            console.log("Updated Docs : ");
+            console.log(docs);
+            if(docs){
+              docs.value=docs.value.filter(e=>e.user!=user) ;
+              docs.save(err=>{
+                console.log(err);
+              })
+
+             }
+        }
+    }
+  );
+ }*/

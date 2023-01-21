@@ -150,8 +150,6 @@ exports.getchatLog = (req, res) => {
             return res.status(500).send({ message: err });
           }
           if(chatlogs){
-            console.log("chatlogs");
-            console.log(chatlogs);
             return res.status(200).send(chatlogs.chat);
           }
           return res.status(200).send([]);
