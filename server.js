@@ -72,7 +72,7 @@ const server =app.listen(PORT, () => {
 });
 const io = require('socket.io')(server, {
   cors: {
-    origins: ["https://elearn-avm2.onrender.com"], 
+    origins: ["https://elearnappsite.vercel.app"], 
   }
 });
 require("./app/routes/socket.routes")(io);
