@@ -9,6 +9,7 @@ module.exports = function(app) {
   });
   app.post("/api/data/getmail", controller.getmail);
   app.post("/api/data/getchatlog", controller.getchatLog);
+  app.post("/api/data/marckchatasoppened", controller.marckchatasoppened);
   app.post("/api/data/putcontacts", controller.putcontacts);
   app.post("/api/data/getunoppenedmail", controller.getunoppenedmail);
   app.post("/api/data/getmailupdate", controller.getmailupdate);

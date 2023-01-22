@@ -38,9 +38,9 @@ exports.getconnectedchatters = function (io) {
                 } else {
                   temp=notconnected.find(e=>e.user==element)
                   if (typeof temp !== 'undefined') {
-                    connectionStatus.push({ user: temp.user, date: temp.at});
+                    connectionStatus.push({ user:element, date: temp.at});
                   }else{
-                    connectionStatus.push({ user: temp.user, date: -2});
+                    connectionStatus.push({ user:element, date: -2});
                   }
                 }
               });

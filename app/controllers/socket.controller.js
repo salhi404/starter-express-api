@@ -34,7 +34,7 @@ exports.disconnecte= (user,io) =>{
               });
               newdata.save((err) => {
                 if (err) {
-                  return res.status(500).send({ message: err });
+                  console.log(err);
                 }
               });
             }else{
@@ -57,8 +57,8 @@ exports.message=(msg) => {
 exports.pushChat=(owner,fromTo,msg) => {
  /* console.log("msg");
   console.log(msg);*/
-  const chat={msg:msg, date:new Date(), isSent:true};
-  const chat2={msg:msg, date:new Date(), isSent:false};
+  const chat={msg:msg, date:new Date(), isSent:true,isoppened:true};
+  const chat2={msg:msg, date:new Date(), isSent:false,isoppened:false};
   chatLog.updateOne(
     { owner: owner,fromTo:fromTo }, 
     { $push: { chat: chat }},function (err, docs) {
