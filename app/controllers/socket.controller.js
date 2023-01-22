@@ -83,30 +83,32 @@ exports.pushChat=(owner,fromTo,msg) => {
       }
   }
 );
-chatLog.updateOne(
-  { owner: fromTo ,fromTo: owner}, 
-  { $push: { chat: chat2 }},function (err, docs) {
-    if (err){
-        console.log(err)
-    }
-    else{
-        console.log("Updated Docs : ", docs);
-        if(docs.matchedCount==0){
-          let emptychatLog2 = new chatLog({
-            owner: fromTo,
-            fromTo:owner,
-            index:1,
-            chat:[chat2]
-          });
-          emptychatLog2.save((err) => {
-            if (err) {
-              return res.status(500).send({ message: err });
-            }
-          });
-        }
-    }
+if(owner!==fromTo){
+  chatLog.updateOne(
+    { owner: fromTo ,fromTo: owner}, 
+    { $push: { chat: chat2 }},function (err, docs) {
+      if (err){
+          console.log(err)
+      }
+      else{
+          console.log("Updated Docs : ", docs);
+          if(docs.matchedCount==0){
+            let emptychatLog2 = new chatLog({
+              owner: fromTo,
+              fromTo:owner,
+              index:1,
+              chat:[chat2]
+            });
+            emptychatLog2.save((err) => {
+              if (err) {
+                return res.status(500).send({ message: err });
+              }
+            });
+          }
+      }
+  }
+  );
 }
-);
 }
 /*function Connecte(user) {
     data.findOne({ key:'disconnected'},function (err, docs) {

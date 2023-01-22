@@ -12,6 +12,7 @@ module.exports = function(app) {
   app.post("/api/data/marckchatasoppened", controller.marckchatasoppened);
   app.post("/api/data/putcontacts", controller.putcontacts);
   app.post("/api/data/getunoppenedmail", controller.getunoppenedmail);
+  app.post("/api/data/getunoppenedchat", controller.getunoppenedchat);
   app.post("/api/data/getmailupdate", controller.getmailupdate);
   app.post("/api/data/sendmail", controller.sendmail);
   app.post("/api/data/deletemail", controller.deletemail);

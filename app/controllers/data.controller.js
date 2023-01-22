@@ -232,6 +232,47 @@ exports.getunoppenedmail = (req, res) => {
 
   }
 };
+exports.getunoppenedchat = (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if(!user){
+          return res.status(561).send({ message: "user not found" });
+        }
+        const owner =user.email;
+        chatLog.find(
+          { owner: user.email }
+      ).then(chatlogs=> {
+            var count=0;
+            chatlogs.forEach(element => {
+              element.chat.forEach(chatt => {
+                if(!chatt.isoppened)count++
+              });
+            });
+            return res.status(200).send({count});
+
+    }).catch(err => {
+      console.log('Oh! Dark');
+      console.log(err);
+    });
+      });
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error) {
+    // Access Denied
+    console.log("error   " + error);
+    return res.status(401).send(error);
+
+  }
+};
 exports.getmailupdate = (req, res) => {
   try {
     const token = req.body.token;
