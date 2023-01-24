@@ -171,6 +171,22 @@ exports.verifymail = (req, res) => {
       });
     });
 };
+
+exports.verifyjwt = (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+        return res.status(200).send({verified:true,msg:'verified'});
+    } else {
+      return res.status(401).send({verified:false,msg:'not verified'});
+    }
+  } catch (error) {
+    // Access Denied
+    console.log("error   " + error);
+    return res.status(500).send({verified:false,msg:'error'});
+  }
+};
 exports.sendverification=async (req, res) => {
   try {
     const token_ = req.body.token;
