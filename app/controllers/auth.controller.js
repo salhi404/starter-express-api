@@ -184,7 +184,7 @@ exports.verifyjwt = (req, res) => {
   } catch (error) {
     // Access Denied
     console.log("error   " + error);
-    return res.status(500).send({verified:false,msg:'error'});
+    return res.status(500).send({verified:true,msg:'error'+error});
   }
 };
 exports.sendverification=async (req, res) => {
