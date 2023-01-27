@@ -1,0 +1,109 @@
+const config = require("../config/auth.config");
+var ObjectId = require('mongoose').Types.ObjectId;
+const db = require("../models");
+const User = db.user;
+const UserData = db.userData;
+const Role = db.role;
+const Token = db.token;
+var jwt = require("jsonwebtoken");
+exports.addevent = async (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        const event = req.body.event;
+        UserData.findOne(
+          { userId: user._id, key: "calenderEvents" }
+        ).then(events => {
+          if (!events) {
+            let newEvents = new UserData({
+              userId: user._id,
+              key: "calenderEvents",
+              data:[event],
+            });
+            newEvents.save((err) => {
+              if (err) {
+                return res.status(500).send({ message: err });
+              }
+            });
+            return res.status(200).send({ message: "new event log added" });
+          } else {
+            events.data.push(event);
+            events.markModified('data');
+            events.save((err, data) => { console.log(err); });
+            return res.status(200).send({ message:  "event log updated" });
+          }
+        }).catch(err => {
+          console.log('error accured in add event');
+          console.log(err);
+          return res.status(500).send({ message: err });
+        });
+      });
+
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error) {
+    // Access Denied
+    console.log("error   " + error);
+    return res.status(401).send(error);
+  }
+};
+exports.getevents = async (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        UserData.findOne(
+          { userId: user._id, key: "calenderEvents" }
+        ).then(events => {
+          if (!events) {
+            let newEvents = new UserData({
+              userId: user._id,
+              key: "calenderEvents",
+              data:[],
+            });
+            newEvents.save((err) => {
+              if (err) {
+                return res.status(500).send({ message: err });
+              }
+            });
+            return res.status(200).send({data:[]});
+          } else {
+            return res.status(200).send({ data:events.data});
+          }
+        }).catch(err => {
+          console.log('error accured in add event');
+          console.log(err);
+          return res.status(500).send({ message: err });
+        });
+      });
+
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error) {
+    // Access Denied
+    console.log("error   " + error);
+    return res.status(401).send(error);
+  }
+};
+

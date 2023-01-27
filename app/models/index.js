@@ -11,6 +11,7 @@ db.token = require("./token.model");
 db.mail = require("./mail.model");
 db.chatLog = require("./chatLog.model");
 db.data = require("./data.model");
+db.userData = require("./userData.model");
 db.ROLES = ["user", "admin", "moderator"];
 
 module.exports = db;
