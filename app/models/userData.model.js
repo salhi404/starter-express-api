@@ -9,6 +9,7 @@ const userDataSchema = new Schema({
   },
   key:String,
   data:[],
+  ind:{ type: Number,default: 0}
 });
 
 const userData = mongoose.model("userData", userDataSchema);
