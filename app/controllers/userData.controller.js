@@ -199,4 +199,52 @@ exports.getevents = async (req, res) => {
     return res.status(401).send(error);
   }
 };
+exports.geteventsDates = async (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        UserData.findOne(
+          { userId: user._id, key: "calenderEvents" }
+        ).then(events => {
+          if (!events) {
+            let newEvents = new UserData({
+              userId: user._id,
+              key: "calenderEvents",
+              data:[],
+            });
+            newEvents.save((err) => {
+              if (err) {
+                return res.status(500).send({ message: err });
+              }
+            });
+            return res.status(200).send({data:[]});
+          } else {
+            return res.status(200).send({ data:events.data.map(ev=>ev.start)});
+          }
 
+        }).catch(err => {
+          console.log('error accured in add event');
+          console.log(err);
+          return res.status(500).send({ message: err });
+        });
+      });
+
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error) {
+    // Access Denied
+    console.log("error   " + error);
+    return res.status(401).send(error);
+  }
+};

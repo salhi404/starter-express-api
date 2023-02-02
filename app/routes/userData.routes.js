@@ -9,6 +9,7 @@ module.exports = function(app) {
   });
   app.post("/api/userdata/addevent", controller.addevent);
   app.post("/api/userdata/getevents", controller.getevents);
+  app.post("/api/userdata/geteventsDates", controller.geteventsDates);
   app.post("/api/userdata/deleteevent", controller.deleteevent);
   app.post("/api/userdata/editevent", controller.editevent);
 };
