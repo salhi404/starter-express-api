@@ -14,9 +14,15 @@ var bcrypt = require("bcryptjs");
 const default_conf='{"id":0,"placeholder":["1","2","3"],}';
 
 exports.signup = (req, res) => {
+  console.log("req.body.birthDate");
+  console.log(req.body.birthDate);
   const user = new User({
     username: req.body.username,
     email: req.body.email,
+    fName: req.body.fName,
+    lName: req.body.lName,
+    birthDate:new Date(req.body.birthDate),
+    grade: req.body.grade,
     password: bcrypt.hashSync(req.body.password, 8),
     //items:[],
     configs:default_conf,
@@ -75,7 +81,9 @@ exports.signup = (req, res) => {
     }
   });
 };
-
+exports.verifyDuplicated = (req, res) => {
+  res.send({ message: "User is not duplicated" });
+};
 exports.signin = (req, res) => {
   User.findOne({
     username: req.body.username,
@@ -120,6 +128,11 @@ exports.signin = (req, res) => {
         contacts:user.contacts,
         token:token,
         verified:user.verified,
+        fName:user.fName,
+        lName:user.lName,
+        birthDate:user.birthDate,
+        grade :user.grade
+
       });
     });
 };

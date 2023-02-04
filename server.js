@@ -45,21 +45,17 @@ db.mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true
   }
-)
-  .then(() => {
+).then(() => {
     console.log("Successfully connect to MongoDB.");
     initial();
-  })
-  .catch(err => {
+  }).catch(err => {
     console.error("Connection error", err);
     process.exit();
   });
-
 // simple route
 app.get("/", (req, res) => {
   res.json({ message: " Welcome " });
 });
-
 // routes
 require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);

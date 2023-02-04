@@ -9,7 +9,14 @@ module.exports = function(app) {
     );
     next();
   });
-
+  app.post(
+    "/api/auth/verifyDuplicated",
+    [
+      verifySignUp.checkDuplicateUsernameOrEmail,
+      verifySignUp.checkRolesExisted
+    ],
+    controller.verifyDuplicated
+  );
   app.post(
     "/api/auth/signup",
     [
