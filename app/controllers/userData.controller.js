@@ -6,6 +6,7 @@ const UserData = db.userData;
 const Role = db.role;
 const Token = db.token;
 var jwt = require("jsonwebtoken");
+const config2 = require("../../token.config");
 const defaultData=[{key:'USERDETAILS',data:{bio:"Passionate learner seeking knowledge growth through connections and discussions on this educational platform."
 
 } }]
@@ -346,6 +347,38 @@ exports.getData = async (req, res) => {
           console.log(err);
           return res.status(500).send({ message: err });
         });
+      });
+
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error){
+    console.log("error   " + error);
+    return res.status(401).send(error);
+  }
+};
+exports.profileImage = async (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        var image = req.body.image;
+        console.log("image");
+        console.log(image);
+        const cloudinary = require('cloudinary').v2
+        /*cloudinary.config(config2.cloud_config);
+        cloudinary.uploader.upload("test.png", (error, result)=>{
+          console.log(result, error);
+        });*/
       });
 
     } else {

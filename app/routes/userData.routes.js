@@ -14,4 +14,5 @@ module.exports = function(app) {
   app.post("/api/userdata/editevent", controller.editevent);
   app.post("/api/userdata/getData", controller.getData);
   app.post("/api/userdata/setData", controller.setData);
+  app.post("/api/userdata/profileImage", controller.profileImage);
 };
