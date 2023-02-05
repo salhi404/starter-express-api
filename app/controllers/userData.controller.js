@@ -6,6 +6,9 @@ const UserData = db.userData;
 const Role = db.role;
 const Token = db.token;
 var jwt = require("jsonwebtoken");
+const defaultData=[{key:'USERDETAILS',data:{bio:"Passionate learner seeking knowledge growth through connections and discussions on this educational platform."
+
+} }]
 exports.addevent = async (req, res) => {
   try {
     const token = req.body.token;
@@ -244,6 +247,112 @@ exports.geteventsDates = async (req, res) => {
     }
   } catch (error) {
     // Access Denied
+    console.log("error   " + error);
+    return res.status(401).send(error);
+  }
+};
+exports.setData = async (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        var data = req.body.data;
+        var key = req.body.key;
+        UserData.findOne(
+          { userId: user._id, key: key }
+        ).then(datas  => {
+          if (!datas) {
+            let newdata = new UserData({
+              userId: user._id,
+              key: key,
+              ind:0,
+              data:[data],
+            });
+            newdata.save((err) => {
+              if (err) {
+                return res.status(500).send({ message: err });
+              }
+            });
+            return res.status(200).send({ message: "new"+key+" data added "});
+          } else {
+            datas.data=[data];
+            datas.markModified('data');
+            datas.save((err, dataa) => { console.log(err); });
+            return res.status(200).send({ message:  "data "+key+"  updated"});
+          }
+        }).catch(err => {
+          console.log('error accured in add event');
+          console.log(err);
+          return res.status(500).send({ message: err });
+        });
+      });
+
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error){
+    console.log("error   " + error);
+    return res.status(401).send(error);
+  }
+};
+exports.getData = async (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        var key = req.body.key;
+        UserData.findOne(
+          { userId: user._id, key: key }
+        ).then(datas  => {
+          if (!datas) {
+            var tempdata={};
+            const found= defaultData.find(dt=>dt.key==key).data;
+            if(typeof(found!=undefined))tempdata=found;
+            let newdata = new UserData({
+              userId: user._id,
+              key: key,
+              ind:0,
+              data:[tempdata],
+            });
+            newdata.save((err) => {
+              if (err) {
+                return res.status(500).send({ message: err });
+              }
+            });
+            if(typeof(found!=undefined))return res.status(200).send({ message: "default data "+key+" generated " ,data:tempdata});
+            return res.status(404).send({ message: "data "+key+" dose not exist " });
+          } else {
+            return res.status(200).send({ message:  "data "+key+"  found " ,data:datas.data[0]});
+          }
+        }).catch(err => {
+          console.log('error accured in add event');
+          console.log(err);
+          return res.status(500).send({ message: err });
+        });
+      });
+
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error){
     console.log("error   " + error);
     return res.status(401).send(error);
   }

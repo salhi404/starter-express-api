@@ -12,4 +12,6 @@ module.exports = function(app) {
   app.post("/api/userdata/geteventsDates", controller.geteventsDates);
   app.post("/api/userdata/deleteevent", controller.deleteevent);
   app.post("/api/userdata/editevent", controller.editevent);
+  app.post("/api/userdata/getData", controller.getData);
+  app.post("/api/userdata/setData", controller.setData);
 };
