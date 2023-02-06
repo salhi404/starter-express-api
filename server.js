@@ -4,6 +4,8 @@ const cookieSession = require("cookie-session");
 const config = require("./token.config");
 const dbConfig = require("./app/config/db.config");
 const app = express();
+multer = require('multer'),
+bodyParser = require('body-parser');
 const cloudinary = require('cloudinary').v2
 var whitelist = ['http://192.168.1.102:4200','http://localhost:4200', 'https://elearnappsite.web.app','https://elearn-avm2.onrender.com/',"https://elearnappsite.vercel.app"];
 var  origin= function (origin, callback) {
@@ -17,12 +19,17 @@ var corsOptions = {
   origin: origin,
   credentials:true,
 };
+
+
 /*cloudinary.config(config.cloud_config);
 cloudinary.uploader.upload("test.png", (error, result)=>{
   console.log(result, error);
 });*/
 app.use(cors(corsOptions));
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 // parse requests of content-type - application/json
 app.use(express.json());
 
@@ -62,7 +69,7 @@ app.get("/", (req, res) => {
 require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
 require("./app/routes/data.routes")(app);
-require("./app/routes/userData.routes")(app);
+require("./app/routes/userData.routes")(app,multer);
 // set port, listen for requests
 const PORT = process.env.PORT || 3000 ;
 const server =app.listen(PORT, () => {

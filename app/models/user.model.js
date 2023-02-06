@@ -10,6 +10,7 @@ const User = mongoose.model(
     lName: String,
     birthDate:Date,
     grade: Number,
+    profileImage:{type:String,default:'??'},
     roles: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -1,5 +1,7 @@
 const controller = require("../controllers/userData.controller");
-module.exports = function(app) {
+const { multeruploadprofile } = require("../middlewares/userdata");
+
+module.exports = function(app,multer) {
   app.use(function(req, res, next) {
     res.header(
       "Access-Control-Allow-Headers",
@@ -14,5 +16,5 @@ module.exports = function(app) {
   app.post("/api/userdata/editevent", controller.editevent);
   app.post("/api/userdata/getData", controller.getData);
   app.post("/api/userdata/setData", controller.setData);
-  app.post("/api/userdata/profileImage", controller.profileImage);
+  app.post("/api/userdata/profileImage", multeruploadprofile(multer,'profileInput'), controller.profileImage);
 };

@@ -6,10 +6,13 @@ const UserData = db.userData;
 const Role = db.role;
 const Token = db.token;
 var jwt = require("jsonwebtoken");
+const cloudinary = require('cloudinary').v2
+var fs = require('fs');
+
 const config2 = require("../../token.config");
 const defaultData=[{key:'USERDETAILS',data:{bio:"Passionate learner seeking knowledge growth through connections and discussions on this educational platform."
-
 } }]
+cloudinary.config(config2.cloud_config);
 exports.addevent = async (req, res) => {
   try {
     const token = req.body.token;
@@ -360,7 +363,9 @@ exports.getData = async (req, res) => {
 };
 exports.profileImage = async (req, res) => {
   try {
-    const token = req.body.token;
+    const token = req.headers.authorization;
+    console.log("req");
+    console.log(req.headers.authorization);
     const verified = jwt.verify(token, config.secret);
     if (verified) {
       const id = verified.id;
@@ -371,14 +376,31 @@ exports.profileImage = async (req, res) => {
         if (!user) {
           return res.status(561).send({ message: "user not found" });
         }
-        var image = req.body.image;
-        console.log("image");
-        console.log(image);
-        const cloudinary = require('cloudinary').v2
-        /*cloudinary.config(config2.cloud_config);
-        cloudinary.uploader.upload("test.png", (error, result)=>{
-          console.log(result, error);
-        });*/
+
+        if (!req.file) {
+          console.log("No file is available!");
+          return res.send({
+            success: false
+          });
+        } else {
+          console.log('File is available!');
+          console.log(req.file);
+          cloudinary.uploader.upload(req.file.path,{folder:'profile'}, (error, result)=>{
+            console.log(result, error); 
+            user.profileImage=result.secure_url;
+            user.markModified('profileImage');
+            user.save();
+            fs.unlinkSync(req.file.path);
+            return res.send({
+              success: true,
+              url:result.secure_url
+            })
+          });
+          
+        }
+        
+       
+        
       });
 
     } else {

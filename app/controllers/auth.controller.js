@@ -24,6 +24,7 @@ exports.signup = (req, res) => {
     birthDate:new Date(req.body.birthDate),
     grade: req.body.grade,
     password: bcrypt.hashSync(req.body.password, 8),
+    profileImage:req.body.fName[0].toUpperCase()+req.body.lName[0].toUpperCase(),
     //items:[],
     configs:default_conf,
     verified:false
@@ -131,8 +132,8 @@ exports.signin = (req, res) => {
         fName:user.fName,
         lName:user.lName,
         birthDate:user.birthDate,
-        grade :user.grade
-
+        grade :user.grade,
+        profileImage:user.profileImage
       });
     });
 };
