@@ -23,6 +23,7 @@ module.exports = async function(io) {
         email: socket.user.email,
         date:new Date(),
         message,
+        profileImage:socket.user.profileImage,
       };
       console.log("roomName");
       console.log(roomName);

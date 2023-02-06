@@ -182,6 +182,7 @@ exports.verifymail = (req, res) => {
       res.status(200).send({
         username: user.username,
         email: user.email,
+        profileImage:user.profileImage,
       });
     });
 };
