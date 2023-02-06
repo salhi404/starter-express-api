@@ -363,9 +363,10 @@ exports.getData = async (req, res) => {
 };
 exports.profileImage = async (req, res) => {
   try {
-    const token = req.headers.authorization;
-    console.log("req");
-    console.log(req.headers.authorization);
+    //const token = req.headers.authorization;
+    const token = req.body.token;
+    //console.log("req");
+    //console.log(req.headers.authorization);
     const verified = jwt.verify(token, config.secret);
     if (verified) {
       const id = verified.id;
@@ -377,7 +378,7 @@ exports.profileImage = async (req, res) => {
           return res.status(561).send({ message: "user not found" });
         }
 
-        if (!req.file) {
+        /*if (!req.file) {
           console.log("No file is available!");
           return res.send({
             success: false
@@ -397,7 +398,21 @@ exports.profileImage = async (req, res) => {
             })
           });
           
-        }
+        }*/
+        const image=req.body.image;
+        cloudinary.uploader.upload(image,{folder:'profile'}, (error, result)=>{
+          console.log(result, error); 
+          user.profileImage=result.secure_url;
+          user.markModified('profileImage');
+          user.save();
+          return res.status(200).send({ message: "user not found" ,success: true,
+          url:result.secure_url });
+         /* return res.send({
+            success: true,
+            url:result.secure_url
+          })*/
+        });
+
         
        
         
