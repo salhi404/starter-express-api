@@ -400,13 +400,18 @@ exports.profileImage = async (req, res) => {
           
         }*/
         const image=req.body.image;
+        console.log(image.length);
         cloudinary.uploader.upload(image,{folder:'profile'}, (error, result)=>{
+          if(error){
+            return res.status(500).send({ message: "image not found" ,success: false });
+          }
           console.log(result, error); 
           user.profileImage=result.secure_url;
           user.markModified('profileImage');
           user.save();
-          return res.status(200).send({ message: "user not found" ,success: true,
-          url:result.secure_url });
+          return res.status(200).send({ message: "image uploaded" ,success: true,
+          url:result.secure_url});
+
          /* return res.send({
             success: true,
             url:result.secure_url
