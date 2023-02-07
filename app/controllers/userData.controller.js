@@ -432,3 +432,36 @@ exports.profileImage = async (req, res) => {
     return res.status(401).send(error);
   }
 };
+
+exports.deleteprofileImage = async (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        user.profileImage=user.fName[0].toUpperCase()+user.lName[0].toUpperCase(); 
+        user.markModified("profileImage");
+        user.save((err,userr) => {
+          if (err) {
+            return res.status(500).send({ message: "image not found" ,success: false });
+          }
+          return res.status(200).send({ message: "image uploaded" ,success: true,url:userr.profileImage });
+        });
+      });
+
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error){
+    console.log("error   " + error);
+    return res.status(401).send(error);
+  }
+};

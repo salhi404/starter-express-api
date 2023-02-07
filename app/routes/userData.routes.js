@@ -17,4 +17,5 @@ module.exports = function(app,multer) {
   app.post("/api/userdata/getData", controller.getData);
   app.post("/api/userdata/setData", controller.setData);
   app.post("/api/userdata/profileImage"/*, multeruploadprofile(multer,'profileInput')*/, controller.profileImage);
+  app.post("/api/userdata/deleteprofileImage"/*, multeruploadprofile(multer,'profileInput')*/, controller.deleteprofileImage);
 };
