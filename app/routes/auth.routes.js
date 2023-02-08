@@ -31,4 +31,9 @@ module.exports = function(app) {
   app.post("/api/auth/verifymail", controller.verifymail);
   app.post("/api/auth/signout", controller.signout);
   app.put("/api/auth/sendverification", controller.sendverification);
+  app.post("/api/auth/updateInfo",
+/*  [
+    verifySignUp.checkDuplicateUsernameOrEmail,
+    verifySignUp.checkRolesExisted
+  ], */controller.updateInfo);
 };

@@ -8,10 +8,8 @@ const Token = db.token;
 var jwt = require("jsonwebtoken");
 const cloudinary = require('cloudinary').v2
 var fs = require('fs');
-
+const dataconfig = require("../config/data");
 const config2 = require("../../token.config");
-const defaultData=[{key:'USERDETAILS',data:{bio:"Passionate learner seeking knowledge growth through connections and discussions on this educational platform."
-} }]
 cloudinary.config(config2.cloud_config);
 exports.addevent = async (req, res) => {
   try {
@@ -327,7 +325,7 @@ exports.getData = async (req, res) => {
         ).then(datas  => {
           if (!datas) {
             var tempdata={};
-            const found= defaultData.find(dt=>dt.key==key).data;
+            const found= dataconfig.defaultData.find(dt=>dt.key==key).data;
             if(typeof(found!=undefined))tempdata=found;
             let newdata = new UserData({
               userId: user._id,
