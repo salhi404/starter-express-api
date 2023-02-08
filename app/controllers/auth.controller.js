@@ -350,3 +350,46 @@ exports.sendverification=async (req, res) => {
     res.status(400).send({message:"An error occured : "+error,nosucess:-4});
   }
 }
+
+exports.changepassword = async (req, res) => {
+  console.log("changepassword");
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        var passwordIsValid = bcrypt.compareSync(
+          req.body.Oldpassword,
+          user.password
+        );
+        if (!passwordIsValid) {
+          return res.status(455).send({ message: "Invalid Password!" });
+        }else{
+          user.password=bcrypt.hashSync(req.body.Newpassword, 8),
+          user.save((err, userr) => {
+            if (err) {
+              res.status(500).send({ message: err });
+              return;
+            }
+            return res.status(200).send({ message: "Password updated" });
+          })
+        }
+
+      });
+
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error){
+    console.log("error   " + error);
+    return res.status(401).send(error);
+  }
+};
