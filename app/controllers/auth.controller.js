@@ -297,7 +297,27 @@ exports.verifymail = (req, res) => {
       });
     });
 };
-
+exports.verifyUsername = (req, res) => {
+  console.log("username");
+  User.findOne({
+    username: req.body.username,
+  })
+    .populate("roles", "-__v")
+    .exec((err, user) => {
+      if (err) {
+        res.status(500).send({ message: err });
+        return;
+      }
+      if (!user) {
+        return res.status(460).send({ message: "username Not registered." });
+      }
+      res.status(200).send({
+        username: user.username,
+        email: user.email,
+        profileImage:user.profileImage,
+      });
+    });
+};
 exports.verifyjwt = (req, res) => {
   try {
     const token = req.body.token;

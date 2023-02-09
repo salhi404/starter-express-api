@@ -29,6 +29,7 @@ module.exports = function(app) {
   app.post("/api/auth/verifyjwt",controller.verifyjwt);
   app.post("/api/auth/signin", controller.signin);
   app.post("/api/auth/verifymail", controller.verifymail);
+  app.post("/api/auth/verifyUsername", controller.verifyUsername);
   app.post("/api/auth/signout", controller.signout);
   app.put("/api/auth/sendverification", controller.sendverification);
   app.post("/api/auth/updateInfo",controller.updateInfo);
