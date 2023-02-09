@@ -15,7 +15,7 @@ module.exports = async function(io) {
       console.log(arg); // "world"
     });
     socket.on('message', ({message, roomName}) => { 
-      controller.pushChat(socket.user.email,roomName,message);
+      controller.pushChat(socket.user.email,roomName,message,socket);
       console.log("message : " + message );
       // generate data to send to receivers
       const outgoingMessage = {

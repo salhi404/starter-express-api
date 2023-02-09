@@ -183,7 +183,7 @@ exports.marckchatasoppened=(req, res) => {
         chatLog.findOne(
           { owner: user.email,fromTo:fromToEmail }
       ).then(chatlog=> {
-            console.log("Updated Docs : ", chatlog);
+            //console.log("Updated Docs : ", chatlog);
             if(!chatlog){
               console.log("ok no chat log ");
               return res.status(200).send({message:"ok no chat log "});
@@ -343,6 +343,33 @@ exports.putcontacts = async (req, res) => {
           }
         });
       return res.send({ message: "contacts Successfully updated" });
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+  } catch (error) {
+    // Access Denied
+    console.log("error   " + error);
+    return res.status(401).send(error);
+  }
+};
+exports.getcontacts = async (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findById(id,
+        function (err, docs) {
+          if (err) {
+            return res.status(500).send({ message: err });
+          }
+          else {
+            console.log("User contacts found : ", docs);
+            return res.status(200).send({ message: "contacts found" ,contacts:docs.contacts});
+          }
+        });
+      
     } else {
       // Access Denied
       return res.status(401).send({ message: "Access Denied" });

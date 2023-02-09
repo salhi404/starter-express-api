@@ -11,6 +11,7 @@ module.exports = function(app) {
   app.post("/api/data/getchatlog", controller.getchatLog);
   app.post("/api/data/marckchatasoppened", controller.marckchatasoppened);
   app.post("/api/data/putcontacts", controller.putcontacts);
+  app.post("/api/data/getcontacts", controller.getcontacts);
   app.post("/api/data/getunoppenedmail", controller.getunoppenedmail);
   app.post("/api/data/getunoppenedchat", controller.getunoppenedchat);
   app.post("/api/data/getmailupdate", controller.getmailupdate);
