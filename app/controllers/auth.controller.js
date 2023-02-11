@@ -34,7 +34,7 @@ exports.signup = (req, res) => {
       res.status(500).send({ message: err });
       return;
     }
-    if (req.body.roles) {
+    /*if (req.body.roles) {
       Role.find(
         {
           name: { $in: req.body.roles },
@@ -54,7 +54,7 @@ exports.signup = (req, res) => {
           });
         }
       );
-    } else {
+    } else {*/
       Role.findOne({ name: "user" }, (err, role) => {
         if (err) {
           res.status(500).send({ message: err });
@@ -91,7 +91,7 @@ exports.signup = (req, res) => {
           res.send({ message: "User was registered successfully!" });
         });
       });
-    }
+   // }
   });
 };
 exports.verifyDuplicated = (req, res) => {
