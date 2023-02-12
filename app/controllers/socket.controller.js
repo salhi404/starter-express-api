@@ -14,7 +14,7 @@ var bcrypt = require("bcryptjs");
 const { array } = require("mongoose/lib/utils");
 exports.disconnecte = (user, io) => {
   return function () {
-    console.log('user disconnected' + new Date());
+    //console.log('user disconnected' + new Date());
     setTimeout(() => {
       var connected = [];
       io.sockets.adapter.sids.forEach(element => {
@@ -106,8 +106,8 @@ exports.pushChat = (owner, fromTo, msg,socket) => {
 
             });
           }
-          console.log("findOne");
-          console.log(fromTo);
+          //console.log("findOne");
+          //console.log(fromTo);
           User.findOne({ email: fromTo }, (err, userr) => {
             if (err) {
                return res.status(500).send({ message: err });

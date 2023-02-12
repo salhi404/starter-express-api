@@ -67,6 +67,7 @@ app.get("/", (req, res) => {
 });
 // routes
 require("./app/routes/auth.routes")(app);
+require("./app/routes/mod.routes")(app);
 require("./app/routes/user.routes")(app);
 require("./app/routes/data.routes")(app);
 require("./app/routes/userData.routes")(app,multer);

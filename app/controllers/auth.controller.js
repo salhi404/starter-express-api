@@ -259,7 +259,6 @@ exports.signout = async (req, res) => {
   }
 };
 exports.verify=async (req, res) => {
-  console.log("verifying 2")
   try {
     const user = await User.findOne({ _id: req.body.id });
     if (!user) return res.status(400).send({messege:"Invalid link no macthed user"});
@@ -298,7 +297,6 @@ exports.verifymail = (req, res) => {
     });
 };
 exports.verifyUsername = (req, res) => {
-  console.log("username");
   User.findOne({
     username: req.body.username,
   })
@@ -336,7 +334,6 @@ exports.verifyjwt = (req, res) => {
 exports.sendverification=async (req, res) => {
   try {
     const token_ = req.body.token;
-    console.log("token :"+token_);
     const verified = jwt.verify(token_, config.secret);
     if(verified){
       const id=verified.id;
@@ -372,7 +369,6 @@ exports.sendverification=async (req, res) => {
 }
 
 exports.changepassword = async (req, res) => {
-  console.log("changepassword");
   try {
     const token = req.body.token;
     const verified = jwt.verify(token, config.secret);

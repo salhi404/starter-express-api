@@ -185,7 +185,6 @@ exports.marckchatasoppened=(req, res) => {
       ).then(chatlog=> {
             //console.log("Updated Docs : ", chatlog);
             if(!chatlog){
-              console.log("ok no chat log ");
               return res.status(200).send({message:"ok no chat log "});
             }else{
               chatlog.chat.forEach(e=>e.isoppened=true);
@@ -194,7 +193,7 @@ exports.marckchatasoppened=(req, res) => {
               return res.status(200).send({message:'done'});
             }
     }).catch(err => {
-      console.log('Oh! Dark');
+      console.log('err chatlog');
       console.log(err);
     });
       });
@@ -258,7 +257,7 @@ exports.getunoppenedchat = (req, res) => {
             return res.status(200).send({count});
 
     }).catch(err => {
-      console.log('Oh! Dark');
+      //console.log('Oh! Dark');
       console.log(err);
     });
       });
@@ -339,7 +338,7 @@ exports.putcontacts = async (req, res) => {
             return res.status(500).send({ message: err });
           }
           else {
-            console.log("Updated User contacts : ", docs);
+           // console.log("Updated User contacts : ", docs);
           }
         });
       return res.send({ message: "contacts Successfully updated" });
@@ -365,7 +364,7 @@ exports.getcontacts = async (req, res) => {
             return res.status(500).send({ message: err });
           }
           else {
-            console.log("User contacts found : ", docs);
+            //console.log("User contacts found : ", docs);
             return res.status(200).send({ message: "contacts found" ,contacts:docs.contacts});
           }
         });
@@ -389,8 +388,8 @@ exports.syncmailtags = async (req, res) => {
     if (verified) {
       const id = verified.id;
       tags.forEach(element => {
-        console.log("recieved tags");
-        console.log(element);
+        /*console.log("recieved tags");
+        console.log(element);*/
         Mail.findByIdAndUpdate(element.mailId, { tags: element.tag },
           function (err, docs) {
             if (err) {
@@ -423,15 +422,15 @@ exports.deletemail = async (req, res) => {
     if (verified) {
       const id = verified.id;
       mails.forEach(element => {
-        console.log("recieved tags");
-        console.log(element);
+        /*console.log("recieved tags");
+        console.log(element);*/
         Mail.deleteOne({ _id: element },
           function (err, docs) {
             if (err) {
               console.log(err)
             }
             else {
-              console.log("Updated Mail : ", docs);
+              //console.log("Updated Mail : ", docs);
             }
           });
       });
