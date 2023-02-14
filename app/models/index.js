@@ -12,6 +12,8 @@ db.mail = require("./mail.model");
 db.chatLog = require("./chatLog.model");
 db.data = require("./data.model");
 db.userData = require("./userData.model");
+db.classroom = require("./classroom.model");
+db.classData = require("./classData.model");
 db.ROLES = ["user", "admin", "moderator"];
 
 module.exports = db;

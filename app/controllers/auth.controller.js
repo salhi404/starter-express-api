@@ -279,9 +279,7 @@ exports.verify=async (req, res) => {
 exports.verifymail = (req, res) => {
   User.findOne({
     email: req.body.mail,
-  })
-    .populate("roles", "-__v")
-    .exec((err, user) => {
+  }).then((err, user) => {
       if (err) {
         res.status(500).send({ message: err });
         return;
@@ -299,9 +297,7 @@ exports.verifymail = (req, res) => {
 exports.verifyUsername = (req, res) => {
   User.findOne({
     username: req.body.username,
-  })
-    .populate("roles", "-__v")
-    .exec((err, user) => {
+  }).then((err, user) => {
       if (err) {
         res.status(500).send({ message: err });
         return;

@@ -18,7 +18,7 @@ const default_conf = '{"id":0,"placeholder":["1","2","3"],}';
 
 exports.getusers = (req, res) => {
   User.find()
-    .populate("roles", "-__v")
+    .populate("roles")
     .exec((err, users) => {
       if (err) {
         res.status(500).send({ message: err });
@@ -40,6 +40,7 @@ exports.getusers = (req, res) => {
             birthDate: usr.birthDate,
             grade: usr.grade,
             verified: usr.verified,
+            OnlineStat:new Date(),
           }
         }
         )
@@ -49,7 +50,7 @@ exports.getusers = (req, res) => {
 exports.changeroles = (req, res) => {
   console.log('changeroles');
   User.findOne({ username: req.body.user })
-    .populate("roles", "-__v")
+    .populate("roles")
     .exec((err, user) => {
       if (err) {
         res.status(500).send({ message: err });
