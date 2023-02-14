@@ -19,7 +19,37 @@ verifyToken = (req, res, next) => {
     next();
   });
 };
+isTeacher = (req, res, next) => {
 
+  User.findById(req.userId).exec((err, user) => {
+    if (err) {
+      res.status(500).send({ message: err });
+      return;
+    }
+
+    Role.find(
+      {
+        _id: { $in: user.roles },
+      },
+      (err, roles) => {
+        if (err) {
+          res.status(500).send({ message: err });
+          return;
+        }
+
+        for (let i = 0; i < roles.length; i++) {
+          if (roles[i].name === "teacher") {
+            next();
+            return;
+          }
+        }
+
+        res.status(403).send({ message: "Require Teacher Role!" });
+        return;
+      }
+    );
+  });
+};
 isAdmin = (req, res, next) => {
 
   User.findById(req.userId).exec((err, user) => {
@@ -89,5 +119,6 @@ const authJwt = {
   verifyToken,
   isAdmin,
   isModerator,
+  isTeacher,
 };
 module.exports = authJwt;

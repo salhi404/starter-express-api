@@ -279,7 +279,7 @@ exports.verify=async (req, res) => {
 exports.verifymail = (req, res) => {
   User.findOne({
     email: req.body.mail,
-  }).then((err, user) => {
+  }).then( user=> {
       if (err) {
         res.status(500).send({ message: err });
         return;
@@ -292,24 +292,32 @@ exports.verifymail = (req, res) => {
         email: user.email,
         profileImage:user.profileImage,
       });
+    }).catch(err => {
+      console.log('error accured in verifymail');
+      console.log(err);
+      return res.status(500).send({ message: err });
     });
 };
 exports.verifyUsername = (req, res) => {
   User.findOne({
     username: req.body.username,
-  }).then((err, user) => {
+  }).then( user => {
       if (err) {
         res.status(500).send({ message: err });
         return;
       }
       if (!user) {
-        return res.status(460).send({ message: "username Not registered." });
+        return res.status(460).send({ message: "username Not registered ok." });
       }
       res.status(200).send({
         username: user.username,
         email: user.email,
         profileImage:user.profileImage,
       });
+    }).catch(err => {
+      console.log('error accured in verifyUsername');
+      console.log(err);
+      return res.status(500).send({ message: err });
     });
 };
 exports.verifyjwt = (req, res) => {

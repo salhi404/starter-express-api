@@ -1,8 +1,5 @@
 const config = require("../config/auth.config");
 const dataconfig = require("../config/data");
-const config_mail = require("../config/db.config");
-const index = require("../config/index.config.js");
-const sendEmail = require("../utils/email");
 var ObjectId = require('mongoose').Types.ObjectId;
 const db = require("../models");
 const crypto = require('crypto');
@@ -13,9 +10,6 @@ const Token = db.token;
 const Mail = db.mail;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
-const { role } = require("../models");
-const default_conf = '{"id":0,"placeholder":["1","2","3"],}';
-
 exports.getusers = (req, res) => {
   User.find()
     .populate("roles")

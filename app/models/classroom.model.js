@@ -6,6 +6,7 @@ const classroomSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "user",
   },
+  name:String,
   subject:{ type: Number,default: 0},
   data:{
     type: Schema.Types.ObjectId,
