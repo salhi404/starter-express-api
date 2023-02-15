@@ -72,6 +72,7 @@ require("./app/routes/user.routes")(app);
 require("./app/routes/data.routes")(app);
 require("./app/routes/userData.routes")(app,multer);
 require("./app/routes/teacher.routes")(app);
+require("./app/routes/students.routes")(app);
 // set port, listen for requests
 const PORT = process.env.PORT || 3000 ;
 const server =app.listen(PORT, () => {

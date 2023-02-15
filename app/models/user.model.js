@@ -25,6 +25,13 @@ const userSchema = new Schema({
       ref: "classroom"
     }],
     default:[]
+  },
+  enrolledIn:{
+    type:[{
+      type: Schema.Types.ObjectId,
+      ref: "classroom"
+    }],
+    default:[]
   }
 })
 const User = mongoose.model(

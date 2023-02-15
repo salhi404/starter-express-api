@@ -8,67 +8,51 @@ const UserData = db.userData;
 const Role = db.role;
 const classroom = db.classroom;
 const classData = db.classData;
-const shortid = require('shortid')
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
-exports.addclass = (req, res) => {
-  console.log("addclass 1");
+exports.enroll = (req, res) => {
+  console.log("enroll 1");
   try {
-    console.log("addclass");
+    console.log("enroll");
     const token = req.body.token;
     const verified = jwt.verify(token, config.secret);
     if (verified) {
       const id = verified.id;
-      User.findOne({ _id: id }).then(user => {
+      User.findOne({ _id: id }).populate("enrolledIn")
+      .exec((err, user) =>  {
+        if(err){
+          console.log('error accured in enroll',err);
+        return res.status(500).send({ message: err });
+        }
         if (!user) {
           return res.status(561).send({ message: "user not found" });
         }
-        console.log("user",user);
-        let newclassData = new classData({
-          notifications:[],
-          events:[],
-          livestreams:[],
-        });
-        newclassData.save((err ,ncdata) => {
-          if (err) {
-            return res.status(500).send({ message: err });
-          }
-          console.log("ncdata",ncdata);
-          const classname=req.body.classname;
-          const classubject=req.body.subject;
-          const uuid=shortid.generate().replace(/[^0-9a-z]/gi, '');
-
-          let newclassroom = new classroom({
-            uuid:uuid.substring(0,6), // TODO - handle duplicat
-            teacher:user._id,
-            teacherFullName: user.fName+" "+user.lName,
-            name:classname,
-            subject:classubject,
-            data:ncdata._id,
-            enrollers:[],
-          });
-          newclassroom.save((err ,ncrdata) => {
-            if (err) {
-              return res.status(500).send({ message: err });
-            }
-            console.log("ncrdata",ncrdata);
-            user.classes.push(ncrdata._id);
-            user.markModified("classes");
+        const uuid = req.body.uuid.trim();
+        if(user.enrolledIn.find(cl=>cl.uuid===uuid)){
+          return res.status(566).send({ message: "alredy registered to classroom" });
+        }
+        classroom.findOne({ uuid: uuid }).then(classroomfound => {
+          if (!classroomfound) {
+            return res.status(565).send({ message: "classroom not found" });
+          }else{
+            user.enrolledIn.push(classroomfound._id)
             user.save((err ,data) => {
               console.log("data",data);
               if (err) {
                 return res.status(500).send({ message: err });
               }
-              return res.status(200).send({ message: "classes" });
+              classroomfound.enrollers.push(user._id);
+              classroomfound.save((err ,data) => {
+                console.log("data",data);
+                if (err) {
+                  return res.status(500).send({ message: err });
+                }
+                return res.status(200).send({ message: "enrolled seccefully" });
+              });
             });
-
-          });
-        });
-        
-        
-      }).catch(err => {
-        console.log('error accured in addclass',err);
-        return res.status(500).send({ message: err });
+          }
+        }
+        );
       });
 
     } else {
@@ -88,7 +72,7 @@ exports.getclasses = (req, res) => {
     if (verified) {
       const id = verified.id;
       User.findOne({ _id: id })
-      .populate("classes")
+      .populate("enrolledIn")
       .exec((err, user) => {
         if (err) {
           return res.status(500).send({ message: err });
@@ -96,14 +80,15 @@ exports.getclasses = (req, res) => {
         if (!user) {
           return res.status(561).send({ message: "user not found" });
         }
-        return res.status(200).send({ message: "classes",classes:user.classes.map(classe=>{
+        return res.status(200).send({ message: "classes",classes:user.enrolledIn.map(classe=>{
+          
           return {
-            uuid:classe.uuid,
             id:classe._id,
             name:classe.name,
             subject:classe.subject,
-            data:classe.data,
-            enrollers:classe.enrollers,
+            uuid:classe.uuid,
+            teacher:classe.teacherFullName
+           // data:classe.data,
           }
         })
       
