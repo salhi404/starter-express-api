@@ -72,7 +72,7 @@ exports.getclasses = (req, res) => {
     if (verified) {
       const id = verified.id;
       User.findOne({ _id: id })
-      .populate("enrolledIn")
+      .populate("enrolledIn AcceptedIn")
       .exec((err, user) => {
         if (err) {
           return res.status(500).send({ message: err });
@@ -80,9 +80,10 @@ exports.getclasses = (req, res) => {
         if (!user) {
           return res.status(561).send({ message: "user not found" });
         }
-        return res.status(200).send({ message: "classes",classes:user.enrolledIn.map(classe=>{
+        const classres=user.enrolledIn.map(classe=>{
           
           return {
+            accepted:false,
             id:classe._id,
             name:classe.name,
             subject:classe.subject,
@@ -90,9 +91,21 @@ exports.getclasses = (req, res) => {
             teacher:classe.teacherFullName
            // data:classe.data,
           }
-        })
-      
-      });
+        }).concat(
+          user.AcceptedIn.map(classe=>{
+            return {
+              accepted:true,
+              id:classe._id,
+              name:classe.name,
+              subject:classe.subject,
+              uuid:classe.uuid,
+              teacher:classe.teacherFullName
+             // data:classe.data,
+            }
+          })
+
+        )
+        return res.status(200).send({ message: "classes",classes:classres });
       });
 
     } else {

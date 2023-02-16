@@ -8,7 +8,7 @@ const classroomSchema = new Schema({
   },
   teacher: {
     type: Schema.Types.ObjectId,
-    ref: "user",
+    ref: "User",
   },
   teacherFullName:String
   ,
@@ -20,10 +20,15 @@ const classroomSchema = new Schema({
   },
   enrollers:[{
     type: Schema.Types.ObjectId,
-    ref: "user"
+    ref: "User"
+  }],
+  enrollersAccepted:[{
+    type: Schema.Types.ObjectId,
+    ref: "User"
   }]
-  
-});
+}, 
+{ timestamps: true }
+);
 
 const classroom = mongoose.model("classroom", classroomSchema);
 module.exports = classroom;

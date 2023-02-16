@@ -32,6 +32,13 @@ const userSchema = new Schema({
       ref: "classroom"
     }],
     default:[]
+  },
+  AcceptedIn:{
+    type:[{
+      type: Schema.Types.ObjectId,
+      ref: "classroom"
+    }],
+    default:[]
   }
 })
 const User = mongoose.model(

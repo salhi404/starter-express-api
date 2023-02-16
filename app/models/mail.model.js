@@ -4,13 +4,13 @@ const Schema = mongoose.Schema;
 const mailSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
-    ref: "user",
+    ref: "User",
     required: true,
   },
   isSent: Boolean,
   fromTo: {
     type: Schema.Types.ObjectId,
-    ref: "user",
+    ref: "User",
     required: true,
   },
   fromToUserName:String,

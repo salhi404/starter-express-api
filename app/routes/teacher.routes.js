@@ -19,5 +19,10 @@ module.exports = function(app) {
     [authJwt.verifyToken, authJwt.isTeacher],
     controller.addclass
   );
+  app.post(
+    "/api/teacher/editacceptedstudent",
+    [authJwt.verifyToken, authJwt.isTeacher],
+    controller.editacceptedstudent
+  );
 
 };
