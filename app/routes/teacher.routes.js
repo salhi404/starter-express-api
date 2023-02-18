@@ -24,5 +24,25 @@ module.exports = function(app) {
     [authJwt.verifyToken, authJwt.isTeacher],
     controller.editacceptedstudent
   );
-
+  app.post(
+    "/api/teacher/getclassevents",
+    [authJwt.verifyToken, authJwt.isTeacher],
+    controller.getclassevents
+  );
+  app.post(
+    "/api/teacher/addclassevent",
+    [authJwt.verifyToken, authJwt.isTeacher],
+    controller.addclassevent
+  );
+  app.post(
+    "/api/teacher/editclassevent",
+    [authJwt.verifyToken, authJwt.isTeacher],
+    controller.editclassevent
+  );
+  app.post(
+    "/api/teacher/deleteclassevent",
+    [authJwt.verifyToken, authJwt.isTeacher],
+    controller.deleteclassevent
+  );
+  
 };

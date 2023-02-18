@@ -371,7 +371,6 @@ exports.sendverification=async (req, res) => {
     res.status(400).send({message:"An error occured : "+error,nosucess:-4});
   }
 }
-
 exports.changepassword = async (req, res) => {
   try {
     const token = req.body.token;

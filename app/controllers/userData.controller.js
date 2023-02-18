@@ -89,9 +89,9 @@ exports.deleteevent = async (req, res) => {
             events.data=events.data.filter(ev=>ev.id!=eventId);
             events.markModified('data');
             events.save((err, data) => { console.log(err); });
-            return res.status(200).send({ message:  "event log deleted" });
+            return res.status(200).send({ message: "event log deleted" });
           }
-          return res.status(404).send({ message:  "event not found" });
+          return res.status(404).send({ message:  "events not found" });
         }).catch(err => {
           console.log('error accured in add event');
           console.log(err);

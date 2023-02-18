@@ -41,7 +41,7 @@ exports.editacceptedstudent = (req, res) => {
           user.markModified('enrolledIn');
           user.markModified('AcceptedIn');
           classfound.save((err, data1) => {
-           // console.log("data1", data1);
+            // console.log("data1", data1);
             if (err) {
               return res.status(500).send({ message: err });
             }
@@ -91,150 +91,136 @@ exports.editacceptedstudent = (req, res) => {
 };
 exports.addclass = (req, res) => {
   try {
-    const token = req.body.token;
-    const verified = jwt.verify(token, config.secret);
-    if (verified) {
-      const id = verified.id;
-      User.findOne({ _id: id }).then(user => {
-        if (!user) {
-          return res.status(561).send({ message: "user not found" });
+    const id = req.userId;
+    User.findOne({ _id: id }).then(user => {
+      if (!user) {
+        return res.status(561).send({ message: "user not found" });
+      }
+      let newclassData = new classData({
+        notifications: [],
+        events: [],
+        livestreams: [],
+      });
+      newclassData.save((err, ncdata) => {
+        if (err) {
+          return res.status(500).send({ message: err });
         }
-        let newclassData = new classData({
-          notifications: [],
-          events: [],
-          livestreams: [],
+        const classname = req.body.classname;
+        const classubject = req.body.subject;
+        const uuid = shortid.generate().replace(/[^0-9a-z]/gi, '');
+
+        let newclassroom = new classroom({
+          uuid: uuid.substring(0, 6), // TODO - handle duplicat
+          teacher: user._id,
+          teacherFullName: user.fName + " " + user.lName,
+          name: classname,
+          subject: classubject,
+          data: ncdata._id,
+          enrollers: [],
+          enrollersAccepted: [],
         });
-        newclassData.save((err, ncdata) => {
+        newclassroom.save((err, ncrdata) => {
           if (err) {
             return res.status(500).send({ message: err });
           }
-          const classname = req.body.classname;
-          const classubject = req.body.subject;
-          const uuid = shortid.generate().replace(/[^0-9a-z]/gi, '');
-
-          let newclassroom = new classroom({
-            uuid: uuid.substring(0, 6), // TODO - handle duplicat
-            teacher: user._id,
-            teacherFullName: user.fName + " " + user.lName,
-            name: classname,
-            subject: classubject,
-            data: ncdata._id,
-            enrollers: [],
-            enrollersAccepted: [],
-          });
-          newclassroom.save((err, ncrdata) => {
+          user.classes.push(ncrdata._id);
+          user.markModified("classes");
+          user.save((err, data) => {
             if (err) {
               return res.status(500).send({ message: err });
             }
-            user.classes.push(ncrdata._id);
-            user.markModified("classes");
-            user.save((err, data) => {
-              if (err) {
-                return res.status(500).send({ message: err });
-              }
-              return res.status(200).send({ message: "classes" });
-            });
-
+            return res.status(200).send({ message: "classes" });
           });
+
         });
-
-
-      }).catch(err => {
-        console.log('error accured in addclass', err);
-        return res.status(500).send({ message: err });
       });
 
-    } else {
-      // Access Denied
-      return res.status(401).send({ message: "Access Denied" });
-    }
+
+    }).catch(err => {
+      console.log('error accured in addclass', err);
+      return res.status(500).send({ message: err });
+    });
+
+
   } catch (error) {
     // Access Denied
     console.log("error   " + error);
     return res.status(401).send(error);
   }
 };
-exports.getclasses =(req, res) => {
+exports.getclasses = (req, res) => {
   try {
-    const token = req.body.token;
-    const verified = jwt.verify(token, config.secret);
-    if (verified) {
-      const id = verified.id;
-      User.findOne({ _id: id })
-        .then( user => {
-          if (!user) {
-            return res.status(561).send({ message: "user not found" });
-          }
-          let findclasses = [];
-          const classNmbr = user.classes.length;
-          let counter=0;
-            user.classes.forEach( (classe, ii) => {
-              // = 
-               classroom.findById(classe).populate("enrollers enrollersAccepted") .exec((err, classroomfound) => {
-                if(err){
-                    console.log('error accured in addclass', err);
-                    return res.status(500).send({ message: err });
-                  }
-                  counter++
-                  const classfnd ={
-                    created:classroomfound.createdAt,
-                    uuid: classroomfound.uuid,
-                    id: classroomfound._id,
-                    name: classroomfound.name,
-                    subject: classroomfound.subject,
-                    data: classroomfound.data,
-                    enrollers:
-                    classroomfound.enrollers.map(
-                      usr => {
-                        return {
-                          username: usr.username,
-                          email: usr.email,
-                          profileImage: usr.profileImage,
-                          fName: usr.fName,
-                          lName: usr.lName,
-                          birthDate: usr.birthDate,
-                          grade: usr.grade,
-                          OnlineStat: new Date(),
-                          accepted: false,
-                        }
-                      }
-                    ).concat(
-                      classroomfound.enrollersAccepted.map(
-                        usr => {
-                          return {
-                            username: usr.username,
-                            email: usr.email,
-                            profileImage: usr.profileImage,
-                            fName: usr.fName,
-                            lName: usr.lName,
-                            birthDate: usr.birthDate,
-                            grade: usr.grade,
-                            OnlineStat: new Date(),
-                            accepted: true,
-                          }
-                        }
-                      )
-                    )
-                    ,
-                  }
-                findclasses.push(classfnd);
-                if (classNmbr==counter){
-                  return res.status(200).send({ message: "classes", classes: findclasses, classNmbr });
-                }
-                
-               })
-               
-               
-
-
+    const id = req.userId;
+    User.findOne({ _id: id })
+      .then(user => {
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        let findclasses = [];
+        const classNmbr = user.classes.length;
+        let counter = 0;
+        user.classes.forEach((classe, ii) => {
+          // = 
+          classroom.findById(classe).populate("enrollers enrollersAccepted").exec((err, classroomfound) => {
+            if (err) {
+              console.log('error accured in addclass', err);
+              return res.status(500).send({ message: err });
             }
-            )
-        })
+            counter++
+            const classfnd = {
+              created: classroomfound.createdAt,
+              uuid: classroomfound.uuid,
+              id: classroomfound._id,
+              name: classroomfound.name,
+              subject: classroomfound.subject,
+              data: classroomfound.data,
+              enrollers:
+                classroomfound.enrollers.map(
+                  usr => {
+                    return {
+                      username: usr.username,
+                      email: usr.email,
+                      profileImage: usr.profileImage,
+                      fName: usr.fName,
+                      lName: usr.lName,
+                      birthDate: usr.birthDate,
+                      grade: usr.grade,
+                      OnlineStat: new Date(),
+                      accepted: false,
+                    }
+                  }
+                ).concat(
+                  classroomfound.enrollersAccepted.map(
+                    usr => {
+                      return {
+                        username: usr.username,
+                        email: usr.email,
+                        profileImage: usr.profileImage,
+                        fName: usr.fName,
+                        lName: usr.lName,
+                        birthDate: usr.birthDate,
+                        grade: usr.grade,
+                        OnlineStat: new Date(),
+                        accepted: true,
+                      }
+                    }
+                  )
+                )
+              ,
+            }
+            findclasses.push(classfnd);
+            if (classNmbr == counter) {
+              return res.status(200).send({ message: "classes", classes: findclasses, classNmbr });
+            }
 
-    } else {
-      // Access Denied
-      return res.status(401).send({ message: "Access Denied" });
-    }
+          })
+
+
+
+
+        }
+        )
+      })
   } catch (error) {
     // Access Denied
     console.log("err Access Denied   " + error);
@@ -242,8 +228,161 @@ exports.getclasses =(req, res) => {
   }
 };
 
-
-
+exports.getclassevents = (req, res) => {
+  try {
+    const id = req.userId;
+    User.findOne({ _id: id })
+      .then(user => {
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        const uuid = req.body.uuid;
+          classroom.findOne({uuid}).populate("data").exec((err, classroomfound) => {
+            if (err) {
+              console.log('error accured in addclass', err);
+              return res.status(500).send({ message: err });
+            }
+            if (classroomfound.teacher != req.userId) {
+              return res.status(401).send({ message: "class not yours" });
+            }
+              return res.status(200).send({ message: "class events", events: classroomfound.data.events });
+          })
+      })
+  } catch (error) {
+    // Access Denied
+    console.log("err Access Denied   " + error);
+    return res.status(401).send(error);
+  }
+};
+exports.getclassevents = (req, res) => {
+  try {
+    const id = req.userId;
+    User.findOne({ _id: id })
+      .then(user => {
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        const uuid = req.body.uuid;
+          classroom.findOne({uuid}).populate("data").exec((err, classroomfound) => {
+            if (err) {
+              console.log('error accured in addclass', err);
+              return res.status(500).send({ message: err });
+            }
+            if (classroomfound.teacher != req.userId) {
+              return res.status(401).send({ message: "class not yours" });
+            }
+              return res.status(200).send({ message: "class events", events: classroomfound.data.events });
+          })
+      })
+  } catch (error) {
+    // Access Denied
+    console.log("err Access Denied   " + error);
+    return res.status(401).send(error);
+  }
+};
+exports.addclassevent = (req, res) => {
+  try {
+    const id = req.userId;
+    User.findOne({ _id: id })
+      .then(user => {
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        const uuid = req.body.uuid;
+        let event = req.body.event;
+          classroom.findOne({uuid}).populate("data").exec((err, classroomfound) => {
+            if (err) {
+              console.log('error accured in addclass', err);
+              return res.status(500).send({ message: err });
+            }
+            if (classroomfound.teacher != req.userId) {
+              return res.status(401).send({ message: "class not yours" });
+            }
+            event.id=classroomfound.data.defauls.eventind;
+            classroomfound.data.defauls.eventind=classroomfound.data.defauls.eventind+1;
+            classroomfound.data.events.push(event);
+            classroomfound.data.markModified("events");
+            classroomfound.data.markModified("defauls");
+            classroomfound.markModified('data');
+            classroomfound.data.save((err, data) => { console.log(err); });
+            classroomfound.save((err, data) => { console.log(err); });
+            return res.status(200).send({ message:  "event log updated" , event:event});
+              // return res.status(200).send({ message: "class events", events: classroomfound.data.events });
+          })
+      })
+  } catch (error) {
+    // Access Denied
+    console.log("err Access Denied   " + error);
+    return res.status(401).send(error);
+  }
+};
+exports.editclassevent = (req, res) => {
+  try {
+    const id = req.userId;
+    User.findOne({ _id: id })
+      .then(user => {
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        const uuid = req.body.uuid;
+        const eventId = req.body.eventId;
+        let eventt = req.body.event;
+          classroom.findOne({uuid}).populate("data").exec((err, classroomfound) => {
+            if (err) {
+              console.log('error accured in addclass', err);
+              return res.status(500).send({ message: err });
+            }
+            if (classroomfound.teacher != req.userId) {
+              return res.status(401).send({ message: "class not yours" });
+            }
+            
+            var tempEvent= classroomfound.data.events.find(ev=>ev.id==eventId);
+            tempEvent.title=eventt.title;
+            tempEvent.start=eventt.start;
+            tempEvent.end=eventt.end;
+            tempEvent.allDay=eventt.allDay;
+            tempEvent.color=eventt.color;
+            classroomfound.data.markModified('events');
+            classroomfound.data.save((err, data) => { console.log(err); });
+            return res.status(200).send({ message:  "event editted" });
+          })
+      })
+  } catch (error) {
+    // Access Denied
+    console.log("err Access Denied   " + error);
+    return res.status(401).send(error);
+  }
+};
+exports.deleteclassevent = (req, res) => {
+  try {
+    const id = req.userId;
+    User.findOne({ _id: id })
+      .then(user => {
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        const uuid = req.body.uuid;
+        const eventId = req.body.eventId;
+          classroom.findOne({uuid}).populate("data").exec((err, classroomfound) => {
+            if (err) {
+              console.log('error accured in addclass', err);
+              return res.status(500).send({ message: err });
+            }
+            if (classroomfound.teacher != req.userId) {
+              return res.status(401).send({ message: "class not yours" });
+            }
+            classroomfound.data.events=classroomfound.data.events.filter(ev=>ev.id!=eventId);
+            classroomfound.data.markModified('events');
+            classroomfound.data.save((err, data) => { console.log(err); });
+            return res.status(200).send({ message: "event log deleted" });
+          })
+      })
+  } catch (error) {
+    // Access Denied
+    console.log("err Access Denied   " + error);
+    return res.status(401).send(error);
+  }
+};
 
         // User.findByIdAndUpdate(id, { $push: { classes: data } },{new: true},(err, user) => {
         //   if (err) {
