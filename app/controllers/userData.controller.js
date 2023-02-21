@@ -3,7 +3,7 @@ var ObjectId = require('mongoose').Types.ObjectId;
 const db = require("../models");
 const User = db.user;
 const UserData = db.userData;
-const Role = db.role;
+const classroom = db.classroom;
 const Token = db.token;
 var jwt = require("jsonwebtoken");
 const cloudinary = require('cloudinary').v2
@@ -172,6 +172,7 @@ exports.getevents = async (req, res) => {
         UserData.findOne(
           { userId: user._id, key: "calenderEvents" }
         ).then(events => {
+          let resevents=[];
           if (!events) {
             let newEvents = new UserData({
               userId: user._id,
@@ -183,10 +184,20 @@ exports.getevents = async (req, res) => {
                 return res.status(500).send({ message: err });
               }
             });
-            return res.status(200).send({data:[]});
           } else {
-            return res.status(200).send({ data:events.data});
+            resevents[0]={class:{name:'personal',uuid:'personal'},data:events.data};
           }
+          classroom.find({'_id':{$in :user.AcceptedIn}}).populate('data').exec((err, foundclasses) => {
+            if (err) {
+              console.log("getEvents err 1",err);
+              res.status(500).send({ message: err });
+              return;
+            }
+            foundclasses.forEach(cll => {
+              resevents.push({class:{name:cll.name,uuid:cll.uuid,subject:cll.subject,count:cll.data.events.lenght},data:cll.data.events})
+            });
+            return res.status(200).send({events:resevents});
+          })
         }).catch(err => {
           console.log('error accured in add event');
           console.log(err);
