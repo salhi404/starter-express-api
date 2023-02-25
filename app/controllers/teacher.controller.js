@@ -161,7 +161,7 @@ exports.getclasses = (req, res) => {
         let counter = 0;
         user.classes.forEach((classe, ii) => {
           // = 
-          classroom.findById(classe).populate("enrollers enrollersAccepted").exec((err, classroomfound) => {
+          classroom.findById(classe).populate("enrollers enrollersAccepted data").exec((err, classroomfound) => {
             if (err) {
               console.log('error accured in addclass', err);
               return res.status(500).send({ message: err });
@@ -173,7 +173,11 @@ exports.getclasses = (req, res) => {
               id: classroomfound._id,
               name: classroomfound.name,
               subject: classroomfound.subject,
-              data: classroomfound.data,
+              data:{
+                events:classroomfound.data.events,
+                livestreams:classroomfound.data.livestreams,
+                notifications:classroomfound.data.notifications,
+              } ,
               enrollers:
                 classroomfound.enrollers.map(
                   usr => {

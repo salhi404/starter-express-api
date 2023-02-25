@@ -1,9 +1,9 @@
 const express = require("express");
+const app = express();
 const cors = require("cors");
 const cookieSession = require("cookie-session");
 const config = require("./token.config");
 const dbConfig = require("./app/config/db.config");
-const app = express();
 multer = require('multer'),
 bodyParser = require('body-parser');
 const cloudinary = require('cloudinary').v2
@@ -21,10 +21,6 @@ var corsOptions = {
 };
 
 
-/*cloudinary.config(config.cloud_config);
-cloudinary.uploader.upload("test.png", (error, result)=>{
-  console.log(result, error);
-});*/
 app.use(cors(corsOptions));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
