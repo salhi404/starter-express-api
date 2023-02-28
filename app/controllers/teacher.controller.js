@@ -110,7 +110,7 @@ exports.addclass = (req, res) => {
         const uuid = shortid.generate().replace(/[^0-9a-z]/gi, '');
 
         let newclassroom = new classroom({
-          uuid: uuid.substring(0, 6), // TODO - handle duplicat
+          uuid: uuid.substring(0, 6),
           teacher: user._id,
           teacherFullName: user.fName + " " + user.lName,
           name: classname,
@@ -129,7 +129,7 @@ exports.addclass = (req, res) => {
             if (err) {
               return res.status(500).send({ message: err });
             }
-            return res.status(200).send({ message: "classes" });
+            return res.status(200).send({ message: "classes",count:user.classes.length });
           });
 
         });

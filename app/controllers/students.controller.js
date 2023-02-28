@@ -47,7 +47,7 @@ exports.enroll = (req, res) => {
                 if (err) {
                   return res.status(500).send({ message: err });
                 }
-                return res.status(200).send({ message: "enrolled seccefully" });
+                return res.status(200).send({ message: "enrolled seccefully",count:user.enrolledIn.length+user.AcceptedIn.length });
               });
             });
           }

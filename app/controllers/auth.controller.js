@@ -205,7 +205,7 @@ exports.signin = (req, res) => {
             if (err) {
               return res.status(500).send({ message: err });
             }
-          });
+          });//adduserinfo
           res.status(200).send({
             id: user._id,
             username: user.username,
@@ -221,6 +221,7 @@ exports.signin = (req, res) => {
             grade :user.grade,
             profileImage:user.profileImage,
             USERDETAILS:dataconfig.USERDETAILS,
+            info:{classesCount:user.classes.length,classesenrollCount:user.enrolledIn.length+user.AcceptedIn.length}
           });
         } else {
           res.status(200).send({
@@ -238,6 +239,7 @@ exports.signin = (req, res) => {
             grade :user.grade,
             profileImage:user.profileImage,
             USERDETAILS:datas.data[0],
+            info:{classesCount:user.classes.length,classesenrollCount:user.enrolledIn.length+user.AcceptedIn.length}
           });
         }
       }).catch(err => {
@@ -330,7 +332,6 @@ exports.verifyjwt = (req, res) => {
       return res.status(401).send({verified:false,msg:'not verified'});
     }
   } catch (error) {
-    // Access Denied
     console.log("error   " + error);
     return res.status(500).send({verified:true,msg:'error'+error});
   }
