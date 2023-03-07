@@ -14,6 +14,7 @@ db.data = require("./data.model");
 db.userData = require("./userData.model");
 db.classroom = require("./classroom.model");
 db.classData = require("./classData.model");
+db.schedule = require("./schedule.model");
 db.ROLES = ["user", "admin", "moderator"];
 
 module.exports = db;

@@ -1,7 +1,8 @@
 const config = require("../config/auth.config");
 const db = require("../models");
+const global = require("../middlewares/global");
 const User = db.user;
-const Role = db.role;
+const schedule = db.schedule;
 const data = db.data;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -27,20 +28,20 @@ exports.getconnectedchatters = function (io) {
             else {
               var notconnected = [];
               if (!docs) {
-                notconnected=[];
+                notconnected = [];
               } else {
-                notconnected=docs.value;
+                notconnected = docs.value;
               }
               var connectionStatus = [];
               chaters.forEach(element => {
                 if (connected.includes(element)) {
                   connectionStatus.push({ user: element, date: -1 });
                 } else {
-                  temp=notconnected.find(e=>e.user==element)
+                  temp = notconnected.find(e => e.user == element)
                   if (typeof temp !== 'undefined') {
-                    connectionStatus.push({ user:element, date: temp.at});
-                  }else{
-                    connectionStatus.push({ user:element, date: -2});
+                    connectionStatus.push({ user: element, date: temp.at });
+                  } else {
+                    connectionStatus.push({ user: element, date: -2 });
                   }
                 }
               });
@@ -67,5 +68,45 @@ exports.getconnectedchatters = function (io) {
     }
   }
 }
+exports.updateschedule = function (io) {
+  return (req, res) => {
+  try {
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) { 
+      // let newschedule = new schedule({
+      //   key: "all",
+      // } , { versionKey: false }
+      // );
+      // newschedule.save((err) => {
+      //   if (err) {
+      //     return res.status(500).send({ message: err });
+      //   }
+      // });
+      global.checkscheduleEvent(res,io);
+      // switch (value.code) {
+      //   case -5:
+      //     console.log('value.code : 1');
+      //     return res.status(500).send(value.send);
+      //   case 1:
+      //   case 2:
+      //   case 3:
+      //     console.log('value.code : 2');
+      //     return res.status(200).send(value.send);
+      //   default:
+      //     return res.status(550).send("switch not matched");
+      // }
+    } else {
+      // Access Denied
+      return res.status(405).send({ message: "Access Denied" });
+    }
+  } catch (error) {
+    // Access Denied
+    console.log("error   " + error);
+    return res.status(500).send(error);
+
+  }
+}
+};
 
 

@@ -8,6 +8,7 @@ module.exports = function(app,io) {
     next();
   });
   app.post("/api/info/getconnectedchatters", controller.getconnectedchatters(io));
+  app.post("/api/info/updateschedule", controller.updateschedule(io));
   //app.post("/api/data/getchatlog", controller.getchatLog);
 
 };

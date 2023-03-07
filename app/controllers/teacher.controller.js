@@ -1,4 +1,5 @@
 const config = require("../config/auth.config");
+const global = require("../middlewares/global");
 const dataconfig = require("../config/data");
 var ObjectId = require('mongoose').Types.ObjectId;
 const db = require("../models");
@@ -447,19 +448,26 @@ exports.editclassnotif = (req, res) => {
           }
           let tempNotifIndex = classroomfound.data.notifications.findIndex((ntf) => ntf.id === notifId);
           if (tempNotifIndex!=-1) {
+            let scheduleId=classroomfound.data.notifications[tempNotifIndex].scheduleId||-1;
             classroomfound.data.notifications[tempNotifIndex] = notif;
-            if(notif.status==3){classroomfound.data.notifschedule=classroomfound.data.notifschedule.filter(ntf=>ntf.id!=notifId)}
+            classroomfound.data.notifications[tempNotifIndex].scheduleId=scheduleId;
+            if(notif.status==3){
+              classroomfound.data.notifschedule=classroomfound.data.notifschedule.filter(ntf=>ntf.id!=notifId)
+            }
             if(notif.status==2){
-              console.log("shedule 1",notif);
-              const notifsceduleInd = classroomfound.data.notifschedule.findIndex((ntf) => ntf.id === notifId);
-              if(notifsceduleInd!=-1){
-                console.log("shedule 2",notifsceduleInd);
-                classroomfound.data.notifschedule[notifsceduleInd] = notif;
-              }else{
-                console.log("shedule 3",classroomfound.data.notifschedule);
-                classroomfound.data.notifschedule.push(notif);
-              }
-              console.log("shedule 4",classroomfound.data.notifschedule);
+              // console.log("shedule 1",notif);
+              // const notifsceduleInd = classroomfound.data.notifschedule.findIndex((ntf) => ntf.id === notifId);
+              // if(notifsceduleInd!=-1){
+              //   console.log("shedule 2",notifsceduleInd);
+              //   classroomfound.data.notifschedule[notifsceduleInd] = notif;
+              // }else{
+              //   console.log("shedule 3",classroomfound.data.notifschedule);
+              //   classroomfound.data.notifschedule.push(notif);
+              // }
+              // console.log("shedule 4",classroomfound.data.notifschedule);
+              // console.log("shedule 1",notif);
+              scheduleId=global.addscheduleEvent("all",1,notif.time,{uuid,...notif},scheduleId);
+              classroomfound.data.notifications[tempNotifIndex].scheduleId=scheduleId;
             }
             classroomfound.data.markModified('notifications');
             classroomfound.data.markModified('notifschedule');
@@ -508,7 +516,6 @@ exports.removeclassnotif = (req, res) => {
     return res.status(401).send(error);
   }
 };
-
 exports.updateclassnotifschedule = (req, res) => {
   try {
     const id = req.userId;
