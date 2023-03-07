@@ -54,6 +54,7 @@ exports.disconnecte = (user, io) => {
 exports.message = (msg) => {
   console.log('message: ' + msg);
 }
+
 exports.pushChat = (owner, fromTo, msg,socket) => {
   console.log("msg");
   console.log(msg);
@@ -137,6 +138,12 @@ exports.pushChat = (owner, fromTo, msg,socket) => {
   }else{
     return res.status(200).send({ message: " selfe chat secces " });
   }
+}
+exports.joinClasses = (user,socket) => {
+  console.log("joinClasses");
+  user.classes.forEach(cll=>socket.join("classes_"+cll));
+  user.enrolledIn.forEach(cll=>socket.join("enrolledIn_"+cll));
+  user.AcceptedIn.forEach(cll=>socket.join("AcceptedIn_"+cll));
 }
 /*function Connecte(user) {
     data.findOne({ key:'disconnected'},function (err, docs) {

@@ -427,7 +427,8 @@ exports.addclassnotif = (req, res) => {
     return res.status(401).send(error);
   }
 };
-exports.editclassnotif = (req, res) => {
+exports.editclassnotif =(io) => {
+  return function (req, res) {
   try {
     const id = req.userId;
     User.findOne({ _id: id })
@@ -452,7 +453,8 @@ exports.editclassnotif = (req, res) => {
             classroomfound.data.notifications[tempNotifIndex] = notif;
             classroomfound.data.notifications[tempNotifIndex].scheduleId=scheduleId;
             if(notif.status==3){
-              classroomfound.data.notifschedule=classroomfound.data.notifschedule.filter(ntf=>ntf.id!=notifId)
+              
+              global.sendNotif(classroomfound.uuid,[{classId:classroomfound.uuid,notification:notif.notification,time:notif.time,}],null,io)
             }
             if(notif.status==2){
               // console.log("shedule 1",notif);
@@ -466,7 +468,7 @@ exports.editclassnotif = (req, res) => {
               // }
               // console.log("shedule 4",classroomfound.data.notifschedule);
               // console.log("shedule 1",notif);
-              scheduleId=global.addscheduleEvent("all",1,notif.time,{uuid,...notif},scheduleId);
+              scheduleId=global.addscheduleEvent("all",1,notif.time,{uuid,...notif},scheduleId,io);
               classroomfound.data.notifications[tempNotifIndex].scheduleId=scheduleId;
             }
             classroomfound.data.markModified('notifications');
@@ -485,6 +487,7 @@ exports.editclassnotif = (req, res) => {
     console.log("err Access Denied   " + error);
     return res.status(401).send(error);
   }
+}
 };
 exports.removeclassnotif = (req, res) => {
   try {

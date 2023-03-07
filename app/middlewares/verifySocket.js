@@ -8,15 +8,21 @@ exports.verifyToken = async function (socket, next){
   
   try {
     const token = socket.handshake.auth.token;
-    const verified = await jwt.verify(token, config.secret);
+    const verified = jwt.verify(token, config.secret);
     
     if(verified){
       const id = verified.id;
-      user1= await User.findOne({ _id: id });
+      let user1= await User.findOne({ _id: id }).populate('enrolledIn AcceptedIn classes');
       if(!user1){
         return next(new Error("User not fond"));
       }else{
-        socket.user = user1;
+        socket.user ={
+          username:user1.username,
+          email:user1.email,
+          classes:user1.classes.map((cll=>cll.uuid)),
+          enrolledIn:user1.enrolledIn.map((cll=>cll.uuid)),
+          AcceptedIn:user1.AcceptedIn.map((cll=>cll.uuid)),
+        } ;
         next();
       }
       }else{

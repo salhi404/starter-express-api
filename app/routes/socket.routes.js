@@ -7,9 +7,10 @@ module.exports = async function(io) {
   io.use(verifyToken);
   io.on('connection', (socket) => {
     socket.join(socket.user.email);
+    controller.joinClasses(socket.user,socket);
     //controller.Connecte(socket.user.email);
     console.log(socket.user.username+' connected ');
-   
+    // console.log("user : ",socket.user);
     socket.on('disconnect', controller.disconnecte(socket.user.email,io));
     socket.on('messages', (arg, callback) => {
       console.log(arg); // "world"

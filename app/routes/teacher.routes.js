@@ -1,7 +1,7 @@
 const { authJwt } = require("../middlewares");
 const controller = require("../controllers/teacher.controller");
 
-module.exports = function(app) {
+module.exports = function(app,io) {
   app.use(function(req, res, next) {
     res.header(
       "Access-Control-Allow-Headers",
@@ -21,7 +21,7 @@ module.exports = function(app) {
 //------------------- Notifivation -----------------------//
   app.post("/api/teacher/getclassnotif",[authJwt.verifyToken, authJwt.isTeacher],controller.getclassnotif);
   app.post("/api/teacher/addclassnotif",[authJwt.verifyToken, authJwt.isTeacher],controller.addclassnotif);
-  app.post("/api/teacher/editclassnotif",[authJwt.verifyToken, authJwt.isTeacher],controller.editclassnotif);
+  app.post("/api/teacher/editclassnotif",[authJwt.verifyToken, authJwt.isTeacher],controller.editclassnotif(io));
   app.post("/api/teacher/removeclassnotif",[authJwt.verifyToken, authJwt.isTeacher],controller.removeclassnotif);
   app.post("/api/teacher/updateclassnotifschedule",[authJwt.verifyToken, authJwt.isTeacher],controller.updateclassnotifschedule);
 };
