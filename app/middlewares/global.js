@@ -5,7 +5,7 @@ const schedule = db.schedule;
 const classroom = db.classroom;
 const classData = db.classData;
 
-function addscheduleEvent(key, type, time, data, scheduleId,io) {
+function addscheduleEvent(key, type, time, data, scheduleId, io) {
   try {
     schedule.findOne(
       { key: key }, function (err, schedulefound) {
@@ -31,7 +31,7 @@ function addscheduleEvent(key, type, time, data, scheduleId,io) {
           // schedulefound.events.splice(insertAt, 0, { type, time, primed: false, data, id:schedulefound.nextId  });
           schedulefound.markModified('events');
           schedulefound.markModified('nextId');
-          schedulefound.save((err, data) => { console.log(err); checkscheduleEvent(null,io); });
+          schedulefound.save((err, data) => { console.log(err); checkscheduleEvent(null, io); });
           return schedulefound.nextId;
         } else {
           return scheduleId;
@@ -46,6 +46,8 @@ function addscheduleEvent(key, type, time, data, scheduleId,io) {
 };
 function checkscheduleEvent(res, io) {
   console.log("checkscheduleEvent");
+  // localStorage.setItem('checkscheduleAt', 'myFirstValue');
+
   try {
     schedule.findOne(
       { key: 'all' }).exec(function (err, schedulefound) {
@@ -81,11 +83,11 @@ function checkscheduleEvent(res, io) {
             //return false;
           }
         });
-        console.log("editlist",editlist);
+        // console.log("editlist",editlist);
         if (editlist.length > 0) fireEvent(editlist, io);
         schedulefound.markModified('events');
         schedulefound.save((err, data) => { console.log("save err", err); });
-        if (res) return res.status(200).send(schedulefound.events);
+        if (res) return res.status(200).send({ message: " schedule checked now " });
         else return 3
       }
       );
@@ -98,12 +100,12 @@ function checkscheduleEvent(res, io) {
 function findAndfireEvent(event, io) {
   try {
     schedule.findOne(
-      { key: 'all'  }).exec(function (err, schedulefound) {
+      { key: 'all' }).exec(function (err, schedulefound) {
         if (err) {
           return -5
         }
-        const foundEvent=schedulefound.events.find(evv=>evv.id==event);
-        console.log("foundEvent",foundEvent);
+        const foundEvent = schedulefound.events.find(evv => evv.id == event);
+        // console.log("foundEvent",foundEvent);
         fireEvent([foundEvent], io);
       }
       );
@@ -111,15 +113,15 @@ function findAndfireEvent(event, io) {
     return -5
   }
 
-}
+};
 function fireEvent(event, io) {
   console.log("fireEvent");
   // switch (event.type) {
   //   case 1:
-  if(event&&event.length>0)editclassnotif(event, null, io)
+  if (event && event.length > 0) editclassnotif(event, null, io)
   //     break;
   // }
-}
+};
 function editclassnotif(datass, res, io) {
   let editlist = [];
   //  console.log("editclassnotif",datas);
@@ -161,14 +163,14 @@ function editclassnotif(datass, res, io) {
       classroomfound.data.markModified('notifications');
       classroomfound.data.save((err, data) => {
         console.log(err);
-        if(!err) {
+        if (!err) {
           console.log("emitt");
           // FIXME scheduleId =null
-          const notifTemp=data.notifications.filter(ntff=>editlistelem.notifId.includes(ntff.id));
-          const notifToSend=notifTemp?.map(ntff=>{return {classId:editlistelem.uuid,notification:ntff.notification,time:ntff.time,}}) ;
-          const taskToSend=notifTemp?.map(ntff=>{return {classId:editlistelem.uuid,notifId:ntff.id,}}) ;
-          console.log("notifToSend",notifToSend);
-          sendNotif(editlistelem.uuid,notifToSend,taskToSend,io);
+          const notifTemp = classroomfound.data.notifications.filter(ntff => editlistelem.notifId.includes(ntff.id) && ntff.status == 3);
+          const notifToSend = notifTemp?.map(ntff => { return { classId: editlistelem.uuid, notifId: ntff.id, notif: { status: ntff.status } } });
+          const taskToSend = notifTemp?.map(ntff => { return { classId: editlistelem.uuid, notifId: ntff.id, notif: { status: ntff.status } } });
+          console.log("notifToSend", notifToSend);
+          if (notifTemp.length > 0) sendNotif(editlistelem.uuid, notifToSend, taskToSend, io);
         }
         // console.log("fire notification : ", notif.notification);
       });
@@ -196,11 +198,11 @@ function deletescheduleEvent(key, id) {
 
   }
 };
-function sendNotif(to,notif,task, io) {
-  console.log('sendNotif',notif);
-  if(notif)io.to("AcceptedIn_"+to).emit('AcceptedIn_Class_Notif', notif);
-  if(task)io.to("classes_"+to).emit('Notif_Sent_Task', task);
-}
+function sendNotif(to, notif, task, io) {
+  console.log('sendNotif', notif);
+  if (notif) io.to("AcceptedIn_" + to).emit('AcceptedIn_Class_Notif', notif);
+  if (task) io.to("classes_" + to).emit('Notif_Sent_Task', task);
+};
 exports.checkscheduleEvent = checkscheduleEvent;
 exports.addscheduleEvent = addscheduleEvent;
 exports.sendNotif = sendNotif;

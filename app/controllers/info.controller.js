@@ -6,6 +6,10 @@ const schedule = db.schedule;
 const data = db.data;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+if (typeof localStorage === "undefined" || localStorage === null) {
+  var LocalStorage = require('node-localstorage').LocalStorage;
+  localStorage = new LocalStorage('./scratch');
+}
 exports.getconnectedchatters = function (io) {
   return (req, res) => {
     try {
@@ -71,6 +75,13 @@ exports.getconnectedchatters = function (io) {
 exports.updateschedule = function (io) {
   return (req, res) => {
   try {
+    const lastcheck = localStorage.getItem('checkscheduleAt');
+    localStorage.setItem('checkscheduleAt', new Date());
+    let diffMill ;
+    // if(lastcheck){
+    //   diffMill  = (new Date(lastcheck).getTime() - new Date().getTime())/ 60000;
+    //   if(diffMill<25)return res.status(200).send({ message: " schedule checked recently" });
+    // }
     const token = req.body.token;
     const verified = jwt.verify(token, config.secret);
     if (verified) { 

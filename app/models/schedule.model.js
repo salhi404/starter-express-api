@@ -6,7 +6,8 @@ const scheduleSchema = new Schema({
   events:{ type: [],default: []},
   nextId:{ type: Number,default: 0},
   // ind:{ type: Number,default: 0},
-});
+}, 
+{ timestamps: true });
 // {type:number,time:Date,primed:boolean,data:any}
 const schedule = mongoose.model("schedule", scheduleSchema);
 module.exports = schedule;

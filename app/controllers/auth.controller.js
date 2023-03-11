@@ -184,8 +184,8 @@ exports.signin = (req, res) => {
         return res.status(455).send({ message: "Invalid Password!" });
       }
       var token = jwt.sign({ id: user.id }, config.secret, {
-        expiresIn: 86400, // 86400   24 hours
-      });
+        expiresIn: 86400, // 86400   24 hours // TODO - change it ti be diffrent for mod admin and student ... 
+       });
 
       //req.session.token = token;
       UserData.findOne(
@@ -289,8 +289,13 @@ exports.verifyUsername = (req, res) => {
 };
 exports.verifyjwt = (req, res) => {
   try {
+    console.log("verifyjwt");
     const token = req.body.token;
-    const verified = jwt.verify(token, config.secret);
+    let verified = null;
+    try {
+      verified = jwt.verify(token, config.secret);
+    } catch (error) {
+    }
     if (verified) {
       const id = verified.id;
       User.findOne({ _id: id })
@@ -305,13 +310,13 @@ exports.verifyjwt = (req, res) => {
           }
           return res.status(200).send({ verified: true, msg: 'verified', user: parseUserdata(user, token, null) });
         });
-
     } else {
-      return res.status(401).send({ verified: false, msg: 'not verified' });
+      return res.status(200).send({ verified: false, msg: console.log('not verified 2') });
     }
   } catch (error) {
     console.log("error   " + error);
-    return res.status(500).send({ verified: false, msg: 'error' + error });
+    if(error=='jwt expired') console.log('error==jwt expired') //return res.status(200).send({ verified: false, msg: console.log('not verified 2') });
+    return res.status(502).send({ verified: false, msg: 'error' + error });
   }
 };
 exports.sendverification = async (req, res) => {

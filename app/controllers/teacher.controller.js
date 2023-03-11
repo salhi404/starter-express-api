@@ -408,7 +408,7 @@ exports.addclassnotif = (req, res) => {
           if (classroomfound.teacher != req.userId) {
             return res.status(401).send({ message: "class not yours" });
           }
-          const notifind =classroomfound.data.defauls.notifind||0;
+          const notifind = classroomfound.data.defauls.notifind || 0;
           notif.id = notifind;
           classroomfound.data.defauls.notifind = notifind + 1;
           classroomfound.data.notifications.push(notif);
@@ -427,67 +427,67 @@ exports.addclassnotif = (req, res) => {
     return res.status(401).send(error);
   }
 };
-exports.editclassnotif =(io) => {
+exports.editclassnotif = (io) => {
   return function (req, res) {
-  try {
-    const id = req.userId;
-    User.findOne({ _id: id })
-      .then(user => {
-        if (!user) {
-          return res.status(561).send({ message: "user not found" });
-        }
-        const uuid = req.body.uuid;
-        let notif = req.body.notif;
-        const notifId = notif.id;
-        classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
-          if (err) {
-            console.log('error accured in addclass', err);
-            return res.status(500).send({ message: err });
+    try {
+      const id = req.userId;
+      User.findOne({ _id: id })
+        .then(user => {
+          if (!user) {
+            return res.status(561).send({ message: "user not found" });
           }
-          if (classroomfound.teacher != req.userId) {
-            return res.status(401).send({ message: "class not yours" });
-          }
-          let tempNotifIndex = classroomfound.data.notifications.findIndex((ntf) => ntf.id === notifId);
-          if (tempNotifIndex!=-1) {
-            let scheduleId=classroomfound.data.notifications[tempNotifIndex].scheduleId||-1;
-            classroomfound.data.notifications[tempNotifIndex] = notif;
-            classroomfound.data.notifications[tempNotifIndex].scheduleId=scheduleId;
-            if(notif.status==3){
-              
-              global.sendNotif(classroomfound.uuid,[{classId:classroomfound.uuid,notification:notif.notification,time:notif.time,}],null,io)
+          const uuid = req.body.uuid;
+          let notif = req.body.notif;
+          const notifId = notif.id;
+          classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
+            if (err) {
+              console.log('error accured in addclass', err);
+              return res.status(500).send({ message: err });
             }
-            if(notif.status==2){
-              // console.log("shedule 1",notif);
-              // const notifsceduleInd = classroomfound.data.notifschedule.findIndex((ntf) => ntf.id === notifId);
-              // if(notifsceduleInd!=-1){
-              //   console.log("shedule 2",notifsceduleInd);
-              //   classroomfound.data.notifschedule[notifsceduleInd] = notif;
-              // }else{
-              //   console.log("shedule 3",classroomfound.data.notifschedule);
-              //   classroomfound.data.notifschedule.push(notif);
-              // }
-              // console.log("shedule 4",classroomfound.data.notifschedule);
-              // console.log("shedule 1",notif);
-              scheduleId=global.addscheduleEvent("all",1,notif.time,{uuid,...notif},scheduleId,io);
-              classroomfound.data.notifications[tempNotifIndex].scheduleId=scheduleId;
+            if (classroomfound.teacher != req.userId) {
+              return res.status(401).send({ message: "class not yours" });
             }
-            classroomfound.data.markModified('notifications');
-            classroomfound.data.markModified('notifschedule');
-            classroomfound.data.save((err, data) => { console.log(err); });
-            return res.status(200).send({ message: "notifications editted",notif});
-          }else{
-            console.log("err notification not found");
-            return res.status(456).send({ message: "notification not found" });
-          }
+            let tempNotifIndex = classroomfound.data.notifications.findIndex((ntf) => ntf.id === notifId);
+            if (tempNotifIndex != -1) {
+              let scheduleId = classroomfound.data.notifications[tempNotifIndex].scheduleId || -1;
+              classroomfound.data.notifications[tempNotifIndex] = notif;
+              classroomfound.data.notifications[tempNotifIndex].scheduleId = scheduleId;
+              if (notif.status == 3) {
 
+                global.sendNotif(classroomfound.uuid, [{ classId: classroomfound.uuid, notification: notif.notification, time: notif.time, }], null, io)
+              }
+              if (notif.status == 2) {
+                // console.log("shedule 1",notif);
+                // const notifsceduleInd = classroomfound.data.notifschedule.findIndex((ntf) => ntf.id === notifId);
+                // if(notifsceduleInd!=-1){
+                //   console.log("shedule 2",notifsceduleInd);
+                //   classroomfound.data.notifschedule[notifsceduleInd] = notif;
+                // }else{
+                //   console.log("shedule 3",classroomfound.data.notifschedule);
+                //   classroomfound.data.notifschedule.push(notif);
+                // }
+                // console.log("shedule 4",classroomfound.data.notifschedule);
+                // console.log("shedule 1",notif);
+                scheduleId = global.addscheduleEvent("all", 1, notif.time, { uuid, ...notif }, scheduleId, io);
+                classroomfound.data.notifications[tempNotifIndex].scheduleId = scheduleId;
+              }
+              classroomfound.data.markModified('notifications');
+              classroomfound.data.markModified('notifschedule');
+              classroomfound.data.save((err, data) => { console.log(err); });
+              return res.status(200).send({ message: "notifications editted", notif });
+            } else {
+              console.log("err notification not found");
+              return res.status(456).send({ message: "notification not found" });
+            }
+
+          })
         })
-      })
-  } catch (error) {
-    // Access Denied
-    console.log("err Access Denied   " + error);
-    return res.status(401).send(error);
+    } catch (error) {
+      // Access Denied
+      console.log("err Access Denied   " + error);
+      return res.status(401).send(error);
+    }
   }
-}
 };
 exports.removeclassnotif = (req, res) => {
   try {
@@ -539,25 +539,25 @@ exports.updateclassnotifschedule = (req, res) => {
           if (classroomfound.teacher != req.userId) {
             return res.status(401).send({ message: "class not yours" });
           }
-              console.log("shedule 1",notif);
-              const notifsceduleInd = classroomfound.data.notifschedule.findIndex((ntf) => ntf.id === notifId);
-              if(task==1){
-                if(notifsceduleInd!=-1){
-                  console.log("shedule 2",notifsceduleInd);
-                  classroomfound.data.notifschedule[notifsceduleInd] = notif;
-                }else{
-                  console.log("shedule 3",classroomfound.data.notifschedule);
-                  classroomfound.data.notifschedule.push(notif);
-                }
-              }else{
-                if(task==2){
-                  classroomfound.data.notifschedule.splice(notifsceduleInd, 1);
-                }
-              }
-              console.log("shedule 4",classroomfound.data.notifschedule);
-            classroomfound.data.markModified('notifschedule');
-            classroomfound.data.save((err, data) => { console.log(err); });
-            return res.status(200).send({ message: "notifications editted",notif});
+          console.log("shedule 1", notif);
+          const notifsceduleInd = classroomfound.data.notifschedule.findIndex((ntf) => ntf.id === notifId);
+          if (task == 1) {
+            if (notifsceduleInd != -1) {
+              console.log("shedule 2", notifsceduleInd);
+              classroomfound.data.notifschedule[notifsceduleInd] = notif;
+            } else {
+              console.log("shedule 3", classroomfound.data.notifschedule);
+              classroomfound.data.notifschedule.push(notif);
+            }
+          } else {
+            if (task == 2) {
+              classroomfound.data.notifschedule.splice(notifsceduleInd, 1);
+            }
+          }
+          console.log("shedule 4", classroomfound.data.notifschedule);
+          classroomfound.data.markModified('notifschedule');
+          classroomfound.data.save((err, data) => { console.log(err); });
+          return res.status(200).send({ message: "notifications editted", notif });
           // }else{
           //   console.log("err notification not found");
           //   return res.status(456).send({ message: "notification not found" });
@@ -572,12 +572,12 @@ exports.updateclassnotifschedule = (req, res) => {
   }
 };
 
-        // User.findByIdAndUpdate(id, { $push: { classes: data } },{new: true},(err, user) => {
-        //   if (err) {
-        //     return res.status(500).send({ message: err });
-        //   }
-        //   if (!user) {
-        //     return res.status(561).send({ message: "user not found" });
-        //   }
-        //   return res.status(200).send({ message: "class added ",classes:user.classes });
-        // });
+// User.findByIdAndUpdate(id, { $push: { classes: data } },{new: true},(err, user) => {
+//   if (err) {
+//     return res.status(500).send({ message: err });
+//   }
+//   if (!user) {
+//     return res.status(561).send({ message: "user not found" });
+//   }
+//   return res.status(200).send({ message: "class added ",classes:user.classes });
+// });

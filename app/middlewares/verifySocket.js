@@ -4,8 +4,6 @@ const db = require("../models");
 const User = db.user;
 const Role = db.role;
 exports.verifyToken = async function (socket, next){
-  console.log("test");
-  
   try {
     const token = socket.handshake.auth.token;
     const verified = jwt.verify(token, config.secret);
