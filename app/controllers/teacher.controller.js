@@ -351,10 +351,15 @@ exports.deleteclassevent = (req, res) => {
           if (classroomfound.teacher != req.userId) {
             return res.status(401).send({ message: "class not yours" });
           }
-          classroomfound.data.events = classroomfound.data.events.filter(ev => ev.id != eventId);
-          classroomfound.data.markModified('events');
-          classroomfound.data.save((err, data) => { console.log(err); });
-          return res.status(200).send({ message: "event log deleted" });
+          const eventToDeleteInd =classroomfound.data.events.findIndex(ev => ev.id == eventId)
+          if(eventToDeleteInd!=-1){
+            const DeletedEvent ={...classroomfound.data.events[eventToDeleteInd]}  ;
+            classroomfound.data.events.splice(eventToDeleteInd,1)
+            classroomfound.data.markModified('events');
+            classroomfound.data.save((err, data) => { console.log(err); });
+            return res.status(200).send({ message: "event log deleted",event:DeletedEvent });
+          }
+          
         })
       })
   } catch (error) {
