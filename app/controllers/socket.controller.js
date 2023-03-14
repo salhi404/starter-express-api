@@ -77,7 +77,7 @@ exports.pushChat = (owner, fromTo, msg,socket) => {
           });
           emptychatLog1.save((err) => {
             if (err) {
-              return res.status(500).send({ message: err });
+              return -1 //res.status(500).send({ message: err });
             }
           });
         }
@@ -102,7 +102,7 @@ exports.pushChat = (owner, fromTo, msg,socket) => {
             });
             emptychatLog2.save((err, docc) => {
               if (err) {
-                return res.status(500).send({ message: err });
+                return -1 //res.status(500).send({ message: err });
               }
 
             });
@@ -111,10 +111,10 @@ exports.pushChat = (owner, fromTo, msg,socket) => {
           //console.log(fromTo);
           User.findOne({ email: fromTo }, (err, userr) => {
             if (err) {
-               return res.status(500).send({ message: err });
+               return -1 //res.status(500).send({ message: err });
             }
             if (!userr) {
-              return res.status(561).send({ message: "user not found" });
+              return -1 //res.status(561).send({ message: "user not found" });
             }
             if(!userr.contacts.find(e=>e.email===owner)){
               userr.contacts.push({
@@ -125,10 +125,10 @@ exports.pushChat = (owner, fromTo, msg,socket) => {
               })
               userr.markModified('contacts');
               userr.save((err,savedcontacts)=>{
-                return res.status(200).send({ message: " chat secces new contact" });
+                return -1 //res.status(200).send({ message: " chat secces new contact" });
               })
             }else{
-              return res.status(200).send({ message: " chat secces" });
+              return -1 //res.status(200).send({ message: " chat secces" });
             }
 
           });
@@ -136,7 +136,7 @@ exports.pushChat = (owner, fromTo, msg,socket) => {
       }
     );
   }else{
-    return res.status(200).send({ message: " selfe chat secces " });
+    return -1 //res.status(200).send({ message: " selfe chat secces " });
   }
 }
 exports.joinClasses = (user,socket) => {
