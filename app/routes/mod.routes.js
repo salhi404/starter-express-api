@@ -20,6 +20,12 @@ module.exports = function(app) {
     [authJwt.verifyToken, authJwt.isAdmin],
     controller.changeroles
   );
+  app.post(
+    "/api/mod/initiate",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    controller.initiate
+  );
+  
   //app.post("/api/auth/signin", controller.signin);
 
 };

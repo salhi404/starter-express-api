@@ -29,19 +29,19 @@ exports.addevent = async (req, res) => {
           { userId: user._id, key: "calenderEvents" }
         ).then(events => {
           if (!events) {
-            event.id=0;
-            let newEvents = new UserData({
-              userId: user._id,
-              key: "calenderEvents",
-              ind:1,
-              data:[event],
-            });
-            newEvents.save((err) => {
-              if (err) {
-                return res.status(500).send({ message: err });
-              }
-            });
-            return res.status(200).send({ message: "new event log added", event:event});
+            // event.id=0;
+            // let newEvents = new UserData({
+            //   userId: user._id,
+            //   key: "calenderEvents",
+            //   ind:1,
+            //   data:[event],
+            // });
+            // newEvents.save((err) => {
+            //   if (err) {
+            //     return res.status(500).send({ message: err });
+            //   }
+            // });
+            return res.status(565).send({ message: "no events found", event});
           } else {
             event.id=events.ind;
             events.ind++;
@@ -232,16 +232,6 @@ exports.geteventsDates = async (req, res) => {
           { userId: user._id, key: "calenderEvents" }
         ).then(events => {
           if (!events) {
-            let newEvents = new UserData({
-              userId: user._id,
-              key: "calenderEvents",
-              data:[],
-            });
-            newEvents.save((err) => {
-              if (err) {
-                return res.status(500).send({ message: err });
-              }
-            });
             return res.status(200).send({data:[]});
           } else {
             return res.status(200).send({ data:events.data.map(ev=>ev.start)});
