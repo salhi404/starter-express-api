@@ -14,4 +14,10 @@ module.exports = function(app) {
     [authJwt.verifyToken,/* authJwt.isTeacher*/],
     controller.getnotifications
   );
+  app.post(
+    "/api/user/cancelnotification",
+    [authJwt.verifyToken,/* authJwt.isTeacher*/],
+    controller.cancelnotification
+  );
+  
 };

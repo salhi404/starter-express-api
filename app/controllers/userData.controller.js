@@ -441,7 +441,6 @@ exports.profileImage = async (req, res) => {
     return res.status(401).send(error);
   }
 };
-
 exports.deleteprofileImage = async (req, res) => {
   try {
     const token = req.body.token;

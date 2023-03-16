@@ -41,6 +41,7 @@ exports.disconnecte = (user, io) => {
             docs.value = docs.value.filter(e => e.user != user);
             docs.value.push({ user: user, at: new Date(Date.now() - 1500) });
             docs.save((err) => { console.log(err) });
+            // FIXME  !!!!  conflict if connecting at the same time
           }
         }).catch(err => {
           console.log('Oh! Dark');
