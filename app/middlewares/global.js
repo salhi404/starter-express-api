@@ -115,7 +115,7 @@ function findAndfireEvent(event, io) {
 
 };
 function fireEvent(event, io) {
-  console.log("fireEvent");
+  console.log("fireEvent",event);
   // switch (event.type) {
   //   case 1:
   if (event && event.length > 0) editclassnotif(event, null, io)
@@ -124,7 +124,7 @@ function fireEvent(event, io) {
 };
 function editclassnotif(datass, res, io) {
   let editlist = [];
-  //  console.log("editclassnotif",datas);
+  //  console.log("editclassnotif",datass);
   datass.forEach(datas => {
     datas.data.forEach(data => {
       // console.log("data",data)
@@ -167,7 +167,7 @@ function editclassnotif(datass, res, io) {
           console.log("emitt");
           // FIXME scheduleId =null
           const notifTemp = classroomfound.data.notifications.filter(ntff => editlistelem.notifId.includes(ntff.id) && ntff.status == 3);
-          const notifToSend = notifTemp?.map(ntff => { return { classId: editlistelem.uuid, notifId: ntff.id, notif: { status: ntff.status } } });
+          const notifToSend = notifTemp?.map(ntff => { return { uuid: editlistelem.uuid, ...ntff  } });
           const taskToSend = notifTemp?.map(ntff => { return { classId: editlistelem.uuid, notifId: ntff.id, notif: { status: ntff.status } } });
           console.log("notifToSend", notifToSend);
           if (notifTemp.length > 0) sendNotif(editlistelem.uuid, notifToSend, taskToSend, io);

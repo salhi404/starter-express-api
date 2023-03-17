@@ -458,8 +458,7 @@ exports.editclassnotif = (io) => {
               classroomfound.data.notifications[tempNotifIndex] = notif;
               classroomfound.data.notifications[tempNotifIndex].scheduleId = scheduleId;
               if (notif.status == 3) {
-
-                global.sendNotif(classroomfound.uuid, [{ classId: classroomfound.uuid, notification: notif.notification, time: notif.time, }], null, io)
+                global.sendNotif(classroomfound.uuid, [{ uuid: classroomfound.uuid,...notif }], null, io)
               }
               if (notif.status == 2) {
                 // console.log("shedule 1",notif);

@@ -19,5 +19,10 @@ module.exports = function(app) {
     [authJwt.verifyToken,/* authJwt.isTeacher*/],
     controller.cancelnotification
   );
+  app.post(
+    "/api/user/updatlastseen",
+    [authJwt.verifyToken,/* authJwt.isTeacher*/],
+    controller.updatlastseen
+  );
   
 };
