@@ -32,12 +32,17 @@ exports.getnotifications = (req, res) => {
             let canceledNotifs = user.AcceptedIn.map(clas => { return { uuid: clas.uuid, notifs: [] } });
             let lastseen = user.AcceptedIn.map(clas => { return { uuid: clas.uuid, notifs: 0 } });
             if (notifs) {
-              canceledNotifs = notifs.data[0];
-              lastseen = notifs.data[1];
+              
+              notifs.data[0].forEach(ntf=>{
+                canceledNotifs.find(ntff=>ntf.uuid==ntff.uuid).notifs = ntf.notifs;
+              });
+              notifs.data[1].forEach(ntf=>{
+                lastseen.find(ntff=>ntf.uuid==ntff.uuid).notifs = ntf.notifs;
+              });
             }
             let resnotifications = [];
             foundclasses.forEach(cll => {
-              resnotifications.push({ class: { name: cll.name, uuid: cll.uuid, subject: cll.subject, count: cll.data.notifications.lenght }, data: cll.data.notifications });
+            resnotifications.push({ class: { name: cll.name, uuid: cll.uuid, subject: cll.subject, count: cll.data.notifications.lenght }, data: cll.data.notifications.filter(ntff=>ntff.status==3) });
             });
             return res.status(200).send({ notifications: resnotifications, canceledNotifs, lastseen });
 

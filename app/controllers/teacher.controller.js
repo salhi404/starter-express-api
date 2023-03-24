@@ -395,7 +395,8 @@ exports.getclassnotif = (req, res) => {
     return res.status(401).send(error);
   }
 };
-exports.addclassnotif = (req, res) => {
+exports.addclassnotif =(io) => {
+  return function (req, res) {
   try {
     const id = req.userId;
     User.findOne({ _id: id })
@@ -417,6 +418,9 @@ exports.addclassnotif = (req, res) => {
           notif.id = notifind;
           classroomfound.data.defauls.notifind = notifind + 1;
           classroomfound.data.notifications.push(notif);
+          if (notif.status == 3) {
+            global.sendNotif(classroomfound.uuid, [{ uuid: classroomfound.uuid,...notif }], null, io)
+          }
           classroomfound.data.markModified("notifications");
           classroomfound.data.markModified("defauls");
           classroomfound.markModified('data');
@@ -431,6 +435,7 @@ exports.addclassnotif = (req, res) => {
     console.log("err Access Denied   " + error);
     return res.status(401).send(error);
   }
+}
 };
 exports.editclassnotif = (io) => {
   return function (req, res) {
