@@ -6,7 +6,9 @@ const User = db.user;
 const UserData = db.userData;
 const classroom = db.classroom;
 const Token = db.token;
+var thenrequest = require('then-request');
 var jwt = require("jsonwebtoken");
+const KJUR = require('jsrsasign');
 exports.getnotifications = (req, res) => {
   try {
     const token = req.body.token;
@@ -32,17 +34,17 @@ exports.getnotifications = (req, res) => {
             let canceledNotifs = user.AcceptedIn.map(clas => { return { uuid: clas.uuid, notifs: [] } });
             let lastseen = user.AcceptedIn.map(clas => { return { uuid: clas.uuid, notifs: 0 } });
             if (notifs) {
-              
-              notifs.data[0].forEach(ntf=>{
-                canceledNotifs.find(ntff=>ntf.uuid==ntff.uuid).notifs = ntf.notifs;
+
+              notifs.data[0].forEach(ntf => {
+                canceledNotifs.find(ntff => ntf.uuid == ntff.uuid).notifs = ntf.notifs;
               });
-              notifs.data[1].forEach(ntf=>{
-                lastseen.find(ntff=>ntf.uuid==ntff.uuid).notifs = ntf.notifs;
+              notifs.data[1].forEach(ntf => {
+                lastseen.find(ntff => ntf.uuid == ntff.uuid).notifs = ntf.notifs;
               });
             }
             let resnotifications = [];
             foundclasses.forEach(cll => {
-            resnotifications.push({ class: { name: cll.name, uuid: cll.uuid, subject: cll.subject, count: cll.data.notifications.lenght }, data: cll.data.notifications.filter(ntff=>ntff.status==3) });
+              resnotifications.push({ class: { name: cll.name, uuid: cll.uuid, subject: cll.subject, count: cll.data.notifications.lenght }, data: cll.data.notifications.filter(ntff => ntff.status == 3) });
             });
             return res.status(200).send({ notifications: resnotifications, canceledNotifs, lastseen });
 
@@ -141,7 +143,7 @@ exports.updatlastseen = (req, res) => {
           if (!notifs) {
             return res.status(560).send({ message: "no lastseen notifications found" });
           } else {
-            notifs.data[1]=newLastSeen;
+            notifs.data[1] = newLastSeen;
             notifs.markModified('data');
             notifs.save((err, dataa) => {
               if (err) {
@@ -168,6 +170,85 @@ exports.updatlastseen = (req, res) => {
     return res.status(401).send(error);
   }
 };
+exports.getsignature = (req, res) => {
+
+  const iat = Math.round(new Date().getTime() / 1000) - 30;
+  const exp = iat + 60 * 60 * 2
+
+  const oHeader = { alg: 'HS256', typ: 'JWT' }
+
+  const oPayload = {
+    sdkKey: config.ZOOM_MEETING_SDK_KEY,
+    mn: req.body.meetingNumber,
+    role: req.body.role,
+    iat: iat,
+    exp: exp,
+    appKey: config.ZOOM_MEETING_SDK_KEY,
+    tokenExp: iat + 60 * 60 * 2
+  }
+
+  const sHeader = JSON.stringify(oHeader)
+  const sPayload = JSON.stringify(oPayload)
+  const signature = KJUR.jws.JWS.sign('HS256', sHeader, sPayload, config.ZOOM_MEETING_SDK_SECRET)
+
+  res.json({
+    signature: signature
+  })
+}
+exports.createmeeting = (req, res) => {
+
+  const meeting = {
+    "agenda": "My Meeting",
+    "default_password": false,
+    "duration": 60,
+    "password": "123456",
+    // "schedule_for": "salhinfo404@gmail.com",
+    "settings": {
+      "allow_multiple_devices": true,
+      // "alternative_hosts": "jchill@example.com;thill@example.com",
+      "host_video": true,
+      "mute_upon_entry": true,
+      "participant_video": true,
+      "join_before_host": true,
+    },
+    "start_time": "2023-03-27T07:30:00Z",
+    "timezone": "America/Los_Angeles",
+    "topic": "My Meeting",
+    "type": 2
+  }
+  // const oPayload = {
+  //   sdkKey: config.ZOOM_MEETING_SDK_KEY,
+  //   mn: req.body.meetingNumber,
+  //   role: req.body.role,
+  //   iat: iat,
+  //   exp: exp,
+  //   appKey: config.ZOOM_MEETING_SDK_KEY,
+  //   tokenExp: iat + 60 * 60 * 2
+  // }
+  const sHeader = JSON.stringify(meeting)
+  try {
+    var asyncres = thenrequest('POST',"https://api.zoom.us/v2/users/me/meetings",meeting).done(function (ress) {
+      try {
+        console.log(ress.getBody('utf8')) ;
+      } catch (error) {
+        console.log('ress',ress);
+        return res.status(562).send(ress);
+      }
+      return res.status(200).send(ress);
+      });
+  } catch (error) {
+    return res.status(561).send({ message: "Access Denied" });
+  }
+
+  // const sPayload = JSON.stringify(oPayload)
+
+  // res.json({
+  //   signature: signature
+  // })
+
+}
+
+
 // exports.userBoard = (req, res) => {
 //   res.status(200).send("User Content.");
 // };
