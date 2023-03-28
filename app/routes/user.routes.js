@@ -1,5 +1,5 @@
 const { authJwt } = require("../middlewares");
-const controller = require("../controllers/user.controller");
+const controller = require("../controllers/user.controller.js");
 
 module.exports = function(app) {
   app.use(function(req, res, next) {
@@ -14,5 +14,5 @@ module.exports = function(app) {
   app.post("/api/user/updatlastseen",[authJwt.verifyToken,/* authJwt.isTeacher*/],controller.updatlastseen);
   app.post("/api/user/getsignature",[authJwt.verifyToken,/* authJwt.isTeacher*/],controller.getsignature);
   app.post("/api/user/createmeeting",[authJwt.verifyToken,/* authJwt.isTeacher*/],controller.createmeeting);
-  
+  app.post("/api/user/getaccestoken",[authJwt.verifyToken,/* authJwt.isTeacher*/],controller.getaccestoken);
 };

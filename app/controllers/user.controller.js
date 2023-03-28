@@ -1,6 +1,10 @@
 
 const config = require("../config/auth.config");
 // var ObjectId = require('mongoose').Types.ObjectId;
+// import { post } from 'got';
+// const https = require("https");
+const axios = require('axios').default;
+const qs = require('qs');
 const db = require("../models");
 const User = db.user;
 const UserData = db.userData;
@@ -9,6 +13,7 @@ const Token = db.token;
 var thenrequest = require('then-request');
 var jwt = require("jsonwebtoken");
 const KJUR = require('jsrsasign');
+
 exports.getnotifications = (req, res) => {
   try {
     const token = req.body.token;
@@ -195,8 +200,89 @@ exports.getsignature = (req, res) => {
     signature: signature
   })
 }
-exports.createmeeting = (req, res) => {
+exports.getaccestoken = async (req, res) => {
+console.log('getaccestoken');
+  const code  = req.body.code;
+  const configure = {
+    headers:{
+      "Authorization": "Basic "+config.Client_ID_Secret_Base64,
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  };
+  const url = "https://zoom.us/oauth/token";
+  var data = {
+    'code': code,
+    "grant_type": "authorization_code"
+  }
+  console.log("stringify : ",qs.stringify(data));
+  //  data = Object.keys(data)
+  // .map((key) => `${key}=${encodeURIComponent(data[key])}`)
+  // .join('+');
+  try {
+    axios.post(url,data, configure)
+  .then(res =>{ console.log('axios res',res);return res.status(200).send(res);})
+  .catch(err => { console.log('axios err',err); return res.status(200).send(err);})
+  } catch (error) {
+    console.error('error',error);
 
+  }
+  // const options = {
+  //   hostname: "zoom.us",
+  //   // port: 8080,
+  //   path: '/oauth/token',
+  //   method: 'POST',
+  //   // json: [
+  //   //   {
+  //       'code': code,
+  //       'grant_type': 'authorization_code',
+  //       // 'redirect_uri': ,
+  //       // 'code_verifier': 
+  //   //   }
+  //   // ],
+  //   responseType: "json",
+  //   headers: {
+  //     "Authorization": "Bearer "+config.Client_ID_Secret_Base64,
+  //     "Content-Type": "application/x-www-form-urlencoded"
+  //   }
+  // }
+  
+  // https
+  //   .request(options, resp => {
+  //     // log the data
+  //     resp.on("data", d => {
+  //       console.log('https data ',d);
+  //       return res.status(200).send({response});
+  //     });
+  //   })
+  //   .on("error", err => {
+  //     console.log("Error: " + err.message);
+  //     return res.status(565).send({msg:err.message});
+  //   });
+
+  // const response = await post(
+  //   "https://zoom.us/oauth/token",
+  //   {
+  //     json: [
+  //       {
+  //         'code': code,
+  //         'grant_type': 'authorization_code',
+  //         // 'redirect_uri': ,
+  //         // 'code_verifier': 
+  //       }
+  //     ],
+  //     responseType: "json",
+  //     headers: {
+  //       "Authorization": "Bearer "+config.Client_ID_Secret_Base64,
+  //       "Content-Type": "application/x-www-form-urlencoded"
+  //     }
+  //   }
+  // );
+  // console.log("response",response);
+
+
+}
+exports.createmeeting = (req, res) => {
+ 
   const meeting = {
     "agenda": "My Meeting",
     "default_password": false,
@@ -216,6 +302,10 @@ exports.createmeeting = (req, res) => {
     "topic": "My Meeting",
     "type": 2
   }
+  var Moptions = {
+    Authorization: 'Basic Ancmo5b845bjieIZRTETLOlTxZDw68OKQ',
+    qs: meeting
+  };
   // const oPayload = {
   //   sdkKey: config.ZOOM_MEETING_SDK_KEY,
   //   mn: req.body.meetingNumber,
@@ -227,7 +317,7 @@ exports.createmeeting = (req, res) => {
   // }
   const sHeader = JSON.stringify(meeting)
   try {
-    var asyncres = thenrequest('POST',"https://api.zoom.us/v2/users/me/meetings",meeting).done(function (ress) {
+    var asyncres = thenrequest('POST',"https://api.zoom.us/v2/users/me/meetings",Moptions).done(function (ress) {
       try {
         console.log(ress.getBody('utf8')) ;
       } catch (error) {
