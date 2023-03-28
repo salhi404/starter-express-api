@@ -212,7 +212,8 @@ console.log('getaccestoken');
   const url = "https://zoom.us/oauth/token";
   var data = {
     'code': code,
-    "grant_type": "authorization_code"
+    "grant_type": "authorization_code",
+    "redirect_uri" : "https://salhisite.web.app/reroute"
   }
   console.log("stringify : ",qs.stringify(data));
   //  data = Object.keys(data)
@@ -220,8 +221,8 @@ console.log('getaccestoken');
   // .join('+');
   try {
     axios.post(url,data, configure)
-  .then(res =>{ console.log('axios res',res);return res.status(200).send(res);})
-  .catch(err => { console.log('axios err',err); return res.status(200).send(err);})
+  .then(res2 =>{ console.log('axios res',res2.data);return res.status(200).send({status:"success",data:res2.data});})
+  .catch(err => { console.log('axios err',err); return res.status(562).send(err);})
   } catch (error) {
     console.error('error',error);
 
