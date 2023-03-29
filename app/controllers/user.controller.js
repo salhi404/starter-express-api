@@ -253,7 +253,6 @@ console.log('getaccestoken');
       return res.status(401).send({ message: "Access Denied" });
     }
     }
-    
     })
   .catch(err => { console.log('axios err',err); return res.status(562).send(err);})
   } catch (error) {
@@ -315,79 +314,7 @@ console.log('getaccestoken');
 
 
 }
-exports.createmeeting = (req, res) => {
-  
 
-  const token = req.body.token;
-  const verified = jwt.verify(token, config.secret);
-  if (verified) {
-    const id = verified.id;
-    User.findOne({ _id: id }, (err, user) => {
-      if (err) {
-        return res.status(500).send({ message: err });
-      }
-      if (!user) {
-        return res.status(561).send({ message: "user not found" });
-      }else{
-        if(new Date().getTime()<user.data.zoomtoken_expire){
-          const configure = {
-            headers:{
-              "Authorization": "Bearer "+user.data.zoomtoken,
-              // "Content-Type": "application/x-www-form-urlencoded"
-            }
-          };
-          const url = "https://api.zoom.us/v2/users/me/meetings";
-          var data = {
-            "agenda": "My Meeting",
-            "default_password": false,
-            "duration": 60,
-            "password": "123456",
-            // "schedule_for": "salhinfo404@gmail.com",
-            "settings": {
-              "allow_multiple_devices": true,
-              // "alternative_hosts": "jchill@example.com;thill@example.com",
-              "host_video": true,
-              "mute_upon_entry": true,
-              "participant_video": true,
-              "join_before_host": true,
-            },
-            "start_time": "2023-03-29T07:30:00Z",
-            "timezone": "America/Los_Angeles",
-            "topic": "My Meeting",
-            "type": 2
-          }
-          try {
-            axios.post(url,data, configure)
-          .then(res2 =>{ 
-            console.log('axios res',res2);
-            return res.status(200).send({msg:"meeting added",data:res2.data});
-            })
-          .catch(err => { 
-            console.log('axios err',err);
-           return res.status(566).send(err);
-          })
-          } catch (error) {
-            console.error('error',error);
-          }
-
-        }else{
-          return res.status(565).send({message:"you need to refresh token"});
-        }
-        
-      }
-    });
-  } else {
-    // Access Denied
-    return res.status(401).send({ message: "Access Denied" });
-  }
-
-  // const sPayload = JSON.stringify(oPayload)
-
-  // res.json({
-  //   signature: signature
-  // })
-
-}
 
 
 // exports.userBoard = (req, res) => {

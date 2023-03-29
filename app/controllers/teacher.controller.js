@@ -12,6 +12,7 @@ const classData = db.classData;
 const shortid = require('shortid')
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+const axios = require('axios').default;
 exports.editacceptedstudent = (req, res) => {
   try {
     const classrm = req.body.classrm;
@@ -248,6 +249,9 @@ exports.getclassevents = (req, res) => {
             console.log('error accured in addclass', err);
             return res.status(500).send({ message: err });
           }
+          if (!classroomfound) {
+            return res.status(567).send({ message: "classroom not found" });
+          }
           if (classroomfound.teacher != req.userId) {
             return res.status(401).send({ message: "class not yours" });
           }
@@ -274,6 +278,9 @@ exports.addclassevent = (req, res) => {
           if (err) {
             console.log('error accured in addclass', err);
             return res.status(500).send({ message: err });
+          }
+          if (!classroomfound) {
+            return res.status(567).send({ message: "classroom not found" });
           }
           if (classroomfound.teacher != req.userId) {
             return res.status(401).send({ message: "class not yours" });
@@ -312,6 +319,9 @@ exports.editclassevent = (req, res) => {
             console.log('error accured in addclass', err);
             return res.status(500).send({ message: err });
           }
+          if (!classroomfound) {
+            return res.status(567).send({ message: "classroom not found" });
+          }
           if (classroomfound.teacher != req.userId) {
             return res.status(401).send({ message: "class not yours" });
           }
@@ -348,18 +358,21 @@ exports.deleteclassevent = (req, res) => {
             console.log('error accured in addclass', err);
             return res.status(500).send({ message: err });
           }
+          if (!classroomfound) {
+            return res.status(567).send({ message: "classroom not found" });
+          }
           if (classroomfound.teacher != req.userId) {
             return res.status(401).send({ message: "class not yours" });
           }
-          const eventToDeleteInd =classroomfound.data.events.findIndex(ev => ev.id == eventId)
-          if(eventToDeleteInd!=-1){
-            const DeletedEvent ={...classroomfound.data.events[eventToDeleteInd]}  ;
-            classroomfound.data.events.splice(eventToDeleteInd,1)
+          const eventToDeleteInd = classroomfound.data.events.findIndex(ev => ev.id == eventId)
+          if (eventToDeleteInd != -1) {
+            const DeletedEvent = { ...classroomfound.data.events[eventToDeleteInd] };
+            classroomfound.data.events.splice(eventToDeleteInd, 1)
             classroomfound.data.markModified('events');
             classroomfound.data.save((err, data) => { console.log(err); });
-            return res.status(200).send({ message: "event log deleted",event:DeletedEvent });
+            return res.status(200).send({ message: "event log deleted", event: DeletedEvent });
           }
-          
+
         })
       })
   } catch (error) {
@@ -383,6 +396,9 @@ exports.getclassnotif = (req, res) => {
             console.log('error accured in addclass', err);
             return res.status(500).send({ message: err });
           }
+          if (!classroomfound) {
+            return res.status(567).send({ message: "classroom not found" });
+          }
           if (classroomfound.teacher != req.userId) {
             return res.status(401).send({ message: "class not yours" });
           }
@@ -395,47 +411,50 @@ exports.getclassnotif = (req, res) => {
     return res.status(401).send(error);
   }
 };
-exports.addclassnotif =(io) => {
+exports.addclassnotif = (io) => {
   return function (req, res) {
-  try {
-    const id = req.userId;
-    User.findOne({ _id: id })
-      .then(user => {
-        if (!user) {
-          return res.status(561).send({ message: "user not found" });
-        }
-        const uuid = req.body.uuid;
-        let notif = req.body.notif;
-        classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
-          if (err) {
-            console.log('error accured in addclass', err);
-            return res.status(500).send({ message: err });
+    try {
+      const id = req.userId;
+      User.findOne({ _id: id })
+        .then(user => {
+          if (!user) {
+            return res.status(561).send({ message: "user not found" });
           }
-          if (classroomfound.teacher != req.userId) {
-            return res.status(401).send({ message: "class not yours" });
-          }
-          const notifind = classroomfound.data.defauls.notifind || 0;
-          notif.id = notifind;
-          classroomfound.data.defauls.notifind = notifind + 1;
-          classroomfound.data.notifications.push(notif);
-          if (notif.status == 3) {
-            global.sendNotif(classroomfound.uuid, [{ uuid: classroomfound.uuid,...notif }], null, io)
-          }
-          classroomfound.data.markModified("notifications");
-          classroomfound.data.markModified("defauls");
-          classroomfound.markModified('data');
-          classroomfound.data.save((err, data) => { console.log(err); });
-          classroomfound.save((err, data) => { console.log(err); });
-          return res.status(200).send({ message: "notifications  added", notif });
-          // return res.status(200).send({ message: "class events", events: classroomfound.data.events });
+          const uuid = req.body.uuid;
+          let notif = req.body.notif;
+          classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
+            if (err) {
+              console.log('error accured in addclass', err);
+              return res.status(500).send({ message: err });
+            }
+            if (!classroomfound) {
+              return res.status(567).send({ message: "classroom not found" });
+            }
+            if (classroomfound.teacher != req.userId) {
+              return res.status(401).send({ message: "class not yours" });
+            }
+            const notifind = classroomfound.data.defauls.notifind || 0;
+            notif.id = notifind;
+            classroomfound.data.defauls.notifind = notifind + 1;
+            classroomfound.data.notifications.push(notif);
+            if (notif.status == 3) {
+              global.sendNotif(classroomfound.uuid, [{ uuid: classroomfound.uuid, ...notif }], null, io)
+            }
+            classroomfound.data.markModified("notifications");
+            classroomfound.data.markModified("defauls");
+            classroomfound.markModified('data');
+            classroomfound.data.save((err, data) => { console.log(err); });
+            classroomfound.save((err, data) => { console.log(err); });
+            return res.status(200).send({ message: "notifications  added", notif });
+            // return res.status(200).send({ message: "class events", events: classroomfound.data.events });
+          })
         })
-      })
-  } catch (error) {
-    // Access Denied
-    console.log("err Access Denied   " + error);
-    return res.status(401).send(error);
+    } catch (error) {
+      // Access Denied
+      console.log("err Access Denied   " + error);
+      return res.status(401).send(error);
+    }
   }
-}
 };
 exports.editclassnotif = (io) => {
   return function (req, res) {
@@ -454,6 +473,9 @@ exports.editclassnotif = (io) => {
               console.log('error accured in addclass', err);
               return res.status(500).send({ message: err });
             }
+            if (!classroomfound) {
+              return res.status(567).send({ message: "classroom not found" });
+            }
             if (classroomfound.teacher != req.userId) {
               return res.status(401).send({ message: "class not yours" });
             }
@@ -463,7 +485,7 @@ exports.editclassnotif = (io) => {
               classroomfound.data.notifications[tempNotifIndex] = notif;
               classroomfound.data.notifications[tempNotifIndex].scheduleId = scheduleId;
               if (notif.status == 3) {
-                global.sendNotif(classroomfound.uuid, [{ uuid: classroomfound.uuid,...notif }], null, io)
+                global.sendNotif(classroomfound.uuid, [{ uuid: classroomfound.uuid, ...notif }], null, io)
               }
               if (notif.status == 2) {
                 // console.log("shedule 1",notif);
@@ -513,6 +535,9 @@ exports.removeclassnotif = (req, res) => {
             console.log('error accured in addclass', err);
             return res.status(500).send({ message: err });
           }
+          if (!classroomfound) {
+            return res.status(567).send({ message: "classroom not found" });
+          }
           if (classroomfound.teacher != req.userId) {
             return res.status(401).send({ message: "class not yours" });
           }
@@ -544,6 +569,9 @@ exports.updateclassnotifschedule = (req, res) => {
           if (err) {
             console.log('error accured in addclass', err);
             return res.status(500).send({ message: err });
+          }
+          if (!classroomfound) {
+            return res.status(567).send({ message: "classroom not found" });
           }
           if (classroomfound.teacher != req.userId) {
             return res.status(401).send({ message: "class not yours" });
@@ -581,6 +609,96 @@ exports.updateclassnotifschedule = (req, res) => {
   }
 };
 
+// ----------- Meetings (LiveStreams) ------------//
+
+exports.createmeeting = (req, res) => {
+  const reqdata = req.body.data;
+  const zoomtoken = req.access_token
+  const configure = {
+    headers: {
+      "Authorization": "Bearer " + zoomtoken,
+      // "Content-Type": "application/x-www-form-urlencoded"
+    }
+  };
+  const url = "https://api.zoom.us/v2/users/me/meetings";
+  var data = {
+    "agenda": reqdata.agenda,
+    "default_password": false,
+    "duration": reqdata.duration,
+    "password": "123456",
+    // "schedule_for": "salhinfo404@gmail.com",
+    "settings": {
+      "allow_multiple_devices": true,
+      // "alternative_hosts": "jchill@example.com;thill@example.com",
+      "host_video": true,
+      "mute_upon_entry": true,
+      "participant_video": true,
+      "join_before_host": true,
+    },
+    "start_time": reqdata.start_time,
+    "timezone": "America/Los_Angeles",
+    "topic": reqdata.topic,
+    "type": 2
+  }
+  try {
+    axios.post(url, data, configure)
+      .then(res2 => {
+        const id = req.userId;
+        User.findOne({ _id: id })
+          .then(user => {
+            if (!user) {
+              return res.status(561).send({ message: "user not found" });
+            }
+            const uuid = req.body.uuid;
+            let meeting = {
+              uuid: res2.data.uuid, 
+              id: res2.data.id, 
+              host_id: res2.data.host_id, 
+              host_email: res2.data.host_email, 
+              topic: res2.data.topic,
+              start_time: res2.data.start_time, 
+              duration: res2.data.duration, 
+              agenda: res2.data.agenda, 
+              start_url: res2.data.start_url,
+              join_url: res2.data.join_url, 
+              password: res2.data.password, 
+              encrypted_password: res2.data.encrypted_password, 
+              status: res2.data.status, 
+            }
+            classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
+              if (err) {
+                console.log('error accured in addclass', err);
+                return res.status(500).send({ message: err });
+              }
+              if (!classroomfound) {
+                return res.status(567).send({ message: "classroom not found" });
+              }
+              if (classroomfound.teacher != req.userId) {
+                return res.status(401).send({ message: "class not yours" });
+              }
+              const meetingind = classroomfound.data.defauls.meetingind || 0;
+              meeting.indd = meetingind;
+              classroomfound.data.defauls.meetingind = meetingind + 1;
+              classroomfound.data.livestreams.push(meeting);
+              classroomfound.data.markModified("livestreams");
+              classroomfound.data.markModified("defauls");
+              classroomfound.markModified('data');
+              classroomfound.data.save((err, data) => { console.log(err); });
+              classroomfound.save((err, data) => { console.log(err); });
+              return res.status(200).send({ message: "livestream  added", meeting });
+              // return res.status(200).send({ message: "class events", events: classroomfound.data.events });
+            })
+          })
+      })
+      .catch(err => {
+        console.log('axios err', err);
+        return res.status(566).send(err);
+      })
+  } catch (error) {
+    console.error('error', error);
+  }
+
+}
 // User.findByIdAndUpdate(id, { $push: { classes: data } },{new: true},(err, user) => {
 //   if (err) {
 //     return res.status(500).send({ message: err });
