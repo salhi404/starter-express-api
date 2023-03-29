@@ -221,7 +221,40 @@ console.log('getaccestoken');
   // .join('+');
   try {
     axios.post(url,data, configure)
-  .then(res2 =>{ console.log('axios res',res2.data);return res.status(200).send({status:"success",data:res2.data});})
+  .then(res2 =>{ 
+    console.log('axios res',res2.data);
+    res2.data.expires_in=(new Date().getTime() + (res2.data.expires_in-5)*1000);
+    if(res2.data.access_token&&res2.data.refresh_token){
+    const token = req.body.token;
+    const verified = jwt.verify(token, config.secret);
+    if (verified) {
+      const id = verified.id;
+      User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+          return res.status(500).send({ message: err });
+        }
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }else{
+          user.data.zoom_refresh_token=res2.data.refresh_token;
+          user.data.zoomtoken_expire=res2.data.expires_in;
+          user.data.zoomtoken=res2.data.access_token;
+          user.data.hasToken=true;
+          user.markModified('data');
+          user.save((err, dataa) => { 
+            console.log(err);
+            if(err)  return res.status(563).send(err);
+            return res.status(200).send({status:"success",data:res2.data,userData:dataa.data});
+          });
+        }
+      });
+    } else {
+      // Access Denied
+      return res.status(401).send({ message: "Access Denied" });
+    }
+    }
+    
+    })
   .catch(err => { console.log('axios err',err); return res.status(562).send(err);})
   } catch (error) {
     console.error('error',error);
@@ -283,52 +316,69 @@ console.log('getaccestoken');
 
 }
 exports.createmeeting = (req, res) => {
- 
-  const meeting = {
-    "agenda": "My Meeting",
-    "default_password": false,
-    "duration": 60,
-    "password": "123456",
-    // "schedule_for": "salhinfo404@gmail.com",
-    "settings": {
-      "allow_multiple_devices": true,
-      // "alternative_hosts": "jchill@example.com;thill@example.com",
-      "host_video": true,
-      "mute_upon_entry": true,
-      "participant_video": true,
-      "join_before_host": true,
-    },
-    "start_time": "2023-03-27T07:30:00Z",
-    "timezone": "America/Los_Angeles",
-    "topic": "My Meeting",
-    "type": 2
-  }
-  var Moptions = {
-    Authorization: 'Basic Ancmo5b845bjieIZRTETLOlTxZDw68OKQ',
-    qs: meeting
-  };
-  // const oPayload = {
-  //   sdkKey: config.ZOOM_MEETING_SDK_KEY,
-  //   mn: req.body.meetingNumber,
-  //   role: req.body.role,
-  //   iat: iat,
-  //   exp: exp,
-  //   appKey: config.ZOOM_MEETING_SDK_KEY,
-  //   tokenExp: iat + 60 * 60 * 2
-  // }
-  const sHeader = JSON.stringify(meeting)
-  try {
-    var asyncres = thenrequest('POST',"https://api.zoom.us/v2/users/me/meetings",Moptions).done(function (ress) {
-      try {
-        console.log(ress.getBody('utf8')) ;
-      } catch (error) {
-        console.log('ress',ress);
-        return res.status(562).send(ress);
+  
+
+  const token = req.body.token;
+  const verified = jwt.verify(token, config.secret);
+  if (verified) {
+    const id = verified.id;
+    User.findOne({ _id: id }, (err, user) => {
+      if (err) {
+        return res.status(500).send({ message: err });
       }
-      return res.status(200).send(ress);
-      });
-  } catch (error) {
-    return res.status(561).send({ message: "Access Denied" });
+      if (!user) {
+        return res.status(561).send({ message: "user not found" });
+      }else{
+        if(new Date().getTime()<user.data.zoomtoken_expire){
+          const configure = {
+            headers:{
+              "Authorization": "Bearer "+user.data.zoomtoken,
+              // "Content-Type": "application/x-www-form-urlencoded"
+            }
+          };
+          const url = "https://api.zoom.us/v2/users/me/meetings";
+          var data = {
+            "agenda": "My Meeting",
+            "default_password": false,
+            "duration": 60,
+            "password": "123456",
+            // "schedule_for": "salhinfo404@gmail.com",
+            "settings": {
+              "allow_multiple_devices": true,
+              // "alternative_hosts": "jchill@example.com;thill@example.com",
+              "host_video": true,
+              "mute_upon_entry": true,
+              "participant_video": true,
+              "join_before_host": true,
+            },
+            "start_time": "2023-03-29T07:30:00Z",
+            "timezone": "America/Los_Angeles",
+            "topic": "My Meeting",
+            "type": 2
+          }
+          try {
+            axios.post(url,data, configure)
+          .then(res2 =>{ 
+            console.log('axios res',res2);
+            return res.status(200).send({msg:"meeting added",data:res2.data});
+            })
+          .catch(err => { 
+            console.log('axios err',err);
+           return res.status(566).send(err);
+          })
+          } catch (error) {
+            console.error('error',error);
+          }
+
+        }else{
+          return res.status(565).send({message:"you need to refresh token"});
+        }
+        
+      }
+    });
+  } else {
+    // Access Denied
+    return res.status(401).send({ message: "Access Denied" });
   }
 
   // const sPayload = JSON.stringify(oPayload)

@@ -415,7 +415,8 @@ function parseUserdata(userr, token, datas) {
     birthDate: userr.birthDate,
     grade: userr.grade,
     profileImage: userr.profileImage,
-    info: { classesCount: userr.classes.length, classesenrollCount: userr.enrolledIn.length + userr.AcceptedIn.length }
+    info: { classesCount: userr.classes.length, classesenrollCount: userr.enrolledIn.length + userr.AcceptedIn.length },
+    data:{hasToken:userr.data.hasToken||false}
   }
   if (datas) userInfo.USERDETAILS = datas;
   return userInfo;

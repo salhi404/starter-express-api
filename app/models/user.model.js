@@ -6,40 +6,18 @@ const userSchema = new Schema({
   password: String,
   fName: String,
   lName: String,
-  birthDate:Date,
+  birthDate: Date,
   grade: Number,
-  profileImage:{type:String,default:'??'},
-  roles: [
-    {
-      type:Schema.Types.ObjectId,
-      ref: "Role"
-    }
-  ],
-  contacts:{type:[],default:[]},
+  profileImage: { type: String, default: '??' },
+  roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
+  contacts: { type: [], default: [] },
+  data: { type: {}, default: {hasToken:false} },
   configs: String,
   verified: Boolean,
-  mailUpdate:{type:Number,default:0},
-  classes:{
-    type:[{
-      type: Schema.Types.ObjectId,
-      ref: "classroom"
-    }],
-    default:[]
-  },
-  enrolledIn:{
-    type:[{
-      type: Schema.Types.ObjectId,
-      ref: "classroom"
-    }],
-    default:[]
-  },
-  AcceptedIn:{
-    type:[{
-      type: Schema.Types.ObjectId,
-      ref: "classroom"
-    }],
-    default:[]
-  }
+  mailUpdate: { type: Number, default: 0 },
+  classes: { type: [{ type: Schema.Types.ObjectId, ref: "classroom" }], default: [] },
+  enrolledIn: { type: [{ type: Schema.Types.ObjectId, ref: "classroom" }], default: [] },
+  AcceptedIn: { type: [{ type: Schema.Types.ObjectId, ref: "classroom" }], default: [] }
 })
 const User = mongoose.model(
   "User",
