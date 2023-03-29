@@ -13,6 +13,7 @@ const shortid = require('shortid')
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const axios = require('axios').default;
+const KJUR = require('jsrsasign');
 exports.editacceptedstudent = (req, res) => {
   try {
     const classrm = req.body.classrm;
@@ -651,19 +652,19 @@ exports.createmeeting = (req, res) => {
             }
             const uuid = req.body.uuid;
             let meeting = {
-              uuid: res2.data.uuid, 
-              id: res2.data.id, 
-              host_id: res2.data.host_id, 
-              host_email: res2.data.host_email, 
+              uuid: res2.data.uuid,
+              id: res2.data.id,
+              host_id: res2.data.host_id,
+              host_email: res2.data.host_email,
               topic: res2.data.topic,
-              start_time: res2.data.start_time, 
-              duration: res2.data.duration, 
-              agenda: res2.data.agenda, 
+              start_time: res2.data.start_time,
+              duration: res2.data.duration,
+              agenda: res2.data.agenda,
               start_url: res2.data.start_url,
-              join_url: res2.data.join_url, 
-              password: res2.data.password, 
-              encrypted_password: res2.data.encrypted_password, 
-              status: res2.data.status, 
+              join_url: res2.data.join_url,
+              password: res2.data.password,
+              encrypted_password: res2.data.encrypted_password,
+              status: res2.data.status,
             }
             classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
               if (err) {
@@ -688,6 +689,9 @@ exports.createmeeting = (req, res) => {
               return res.status(200).send({ message: "livestream  added", meeting });
               // return res.status(200).send({ message: "class events", events: classroomfound.data.events });
             })
+          }).catch(err => {
+            console.log('axios err', err);
+            return res.status(566).send(err);
           })
       })
       .catch(err => {
@@ -699,6 +703,63 @@ exports.createmeeting = (req, res) => {
   }
 
 }
+exports.getsignature = (req, res) => {
+  const zakToken = req.zakToken;
+  
+  // const access_token = req.access_token ;
+
+  const id = req.userId;
+  User.findOne({ _id: id })
+    .then(user => {
+      if (!user) {
+        return res.status(561).send({ message: "user not found" });
+      }
+      const uuid = req.body.uuid;
+      const indd = req.body.indd;
+      classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
+        if (err) {
+          console.log('error accured in addclass', err);
+          return res.status(500).send({ message: err });
+        }
+        if (!classroomfound) {
+          return res.status(567).send({ message: "classroom not found" });
+        }
+        if (classroomfound.teacher != req.userId) {
+          return res.status(401).send({ message: "class not yours" });
+        }
+        const info = classroomfound.data.livestreams.find(livestream=>livestream.indd==indd);
+        if (info) {
+          
+          const iat = Math.round(new Date().getTime() / 1000) - 30;
+          const exp = iat + 60 * 60 * 2
+          const oHeader = { alg: 'HS256', typ: 'JWT' }
+          const oPayload = {
+            sdkKey: config.ZOOM_MEETING_SDK_KEY,
+            mn: info.id,
+            role: 1,
+            iat: iat,
+            exp: exp,
+            appKey: config.ZOOM_MEETING_SDK_KEY,
+            tokenExp: iat + 60 * 60 * 2
+          }
+          const sHeader = JSON.stringify(oHeader)
+          const sPayload = JSON.stringify(oPayload)
+          const signature = KJUR.jws.JWS.sign('HS256', sHeader, sPayload, config.ZOOM_MEETING_SDK_SECRET)
+          
+          return res.json({ 
+          signature , 
+          info:{
+            ...info,
+            zakToken,
+            sdkKey:config.ZOOM_MEETING_SDK_KEY,
+            userName:user.username,
+          
+          } });}
+        else {return res.status(568).send({ signature , info })}
+      })
+    })
+}
+
 // User.findByIdAndUpdate(id, { $push: { classes: data } },{new: true},(err, user) => {
 //   if (err) {
 //     return res.status(500).send({ message: err });

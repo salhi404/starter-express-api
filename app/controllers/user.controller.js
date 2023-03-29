@@ -10,7 +10,6 @@ const User = db.user;
 const UserData = db.userData;
 const classroom = db.classroom;
 const Token = db.token;
-var thenrequest = require('then-request');
 var jwt = require("jsonwebtoken");
 const KJUR = require('jsrsasign');
 

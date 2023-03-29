@@ -1,6 +1,6 @@
 const { authJwt } = require("../middlewares");
 const controller = require("../controllers/teacher.controller");
-const { refreshToken } = require("../middlewares/zoom.js");
+const  zoomMidlwares  = require("../middlewares/zoom");
 module.exports = function(app,io) {
   app.use(function(req, res, next) {
     res.header(
@@ -27,4 +27,6 @@ module.exports = function(app,io) {
 
 // ----------- Meetings (LiveStreams) ------------//
   app.post("/api/teacher/createmeeting",[authJwt.verifyToken,authJwt.isTeacher,refreshToken],controller.createmeeting);
+  app.post("/api/teacher/getsignature",[authJwt.verifyToken,authJwt.isTeacher,zoomMidlwares.refreshToken,zoomMidlwares.getzakToken],controller.getsignature);
+  
 };
