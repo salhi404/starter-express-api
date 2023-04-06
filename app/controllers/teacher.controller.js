@@ -622,6 +622,7 @@ exports.createmeeting = (req, res) => {
     }
   };
   const url = "https://api.zoom.us/v2/users/me/meetings";
+  console.log("reqdata.start_time",reqdata.start_time);
   var data = {
     "agenda": reqdata.agenda,
     "default_password": false,
