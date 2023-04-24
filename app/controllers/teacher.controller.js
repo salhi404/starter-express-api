@@ -181,6 +181,7 @@ exports.getclasses = (req, res) => {
                 livestreams: classroomfound.data.livestreams,
                 notifications: classroomfound.data.notifications,
                 notifschedule: classroomfound.data.notifschedule,
+                whiteboards: classroomfound.data.whiteboards,
               },
               enrollers:
                 classroomfound.enrollers.map(

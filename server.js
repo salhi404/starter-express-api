@@ -7,7 +7,7 @@ const dbConfig = require("./app/config/db.config");
 multer = require('multer'),
 bodyParser = require('body-parser');
 const cloudinary = require('cloudinary').v2
-var whitelist = ['http://192.168.1.102:4200','http://localhost:4200', 'https://elearnappsite.web.app','https://elearn-avm2.onrender.com/',"https://elearnappsite.vercel.app"];
+var whitelist = ['http://192.168.1.2:4200','http://localhost:4200', 'https://elearnappsite.web.app','https://elearn-avm2.onrender.com/',"https://elearnappsite.vercel.app"];
 var  origin= function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true)
