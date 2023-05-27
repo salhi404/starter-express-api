@@ -762,6 +762,132 @@ exports.getsignature = (req, res) => {
     })
 }
 
+
+// ----------- Notifications ------------//
+
+exports.addclassWboard = (io) => {
+  return function (req, res) {
+    try {
+      const id = req.userId;
+      User.findOne({ _id: id })
+        .then(user => {
+          if (!user) {
+            return res.status(561).send({ message: "user not found" });
+          }
+          const uuid = req.body.uuid;
+          let Wboard = req.body.Wboard;
+          classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
+            if (err) {
+              console.log('error accured in addclass', err);
+              return res.status(500).send({ message: err });
+            }
+            if (!classroomfound) {
+              return res.status(567).send({ message: "classroom not found" });
+            }
+            if (classroomfound.teacher != req.userId) {
+              return res.status(401).send({ message: "class not yours" });
+            }
+            const Wboardind = classroomfound.data.defauls.Wboardind || 0;
+            Wboard.id = Wboardind;
+            classroomfound.data.defauls.Wboardind = Wboardind + 1;
+            classroomfound.data.whiteboards.push(Wboard);
+            // if (notif.status == 3) {
+            //   global.sendNotif(classroomfound.uuid, [{ uuid: classroomfound.uuid, ...notif }], null, io)
+            // }
+            classroomfound.data.markModified("whiteboards");
+            classroomfound.data.markModified("defauls");
+            classroomfound.markModified('data');
+            classroomfound.data.save((err, data) => { console.log(err); });
+            classroomfound.save((err, data) => { console.log(err); });
+            return res.status(200).send({ message: "whiteboard  added", Wboard });
+            // return res.status(200).send({ message: "class events", events: classroomfound.data.events });
+          })
+        })
+    } catch (error) {
+      // Access Denied
+      console.log("err Access Denied   " + error);
+      return res.status(401).send(error);
+    }
+  }
+};
+
+exports.editclassWboard = (io) => {
+  return function (req, res) {
+    try {
+      const id = req.userId;
+      User.findOne({ _id: id })
+        .then(user => {
+          if (!user) {
+            return res.status(561).send({ message: "user not found" });
+          }
+          const uuid = req.body.uuid;
+          let Wboard = req.body.Wboard;
+          const WboardId = Wboard.id;
+          classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
+            if (err) {
+              console.log('error accured in addclass', err);
+              return res.status(500).send({ message: err });
+            }
+            if (!classroomfound) {
+              return res.status(567).send({ message: "classroom not found" });
+            }
+            if (classroomfound.teacher != req.userId) {
+              return res.status(401).send({ message: "class not yours" });
+            }
+            let tempWboardIndex = classroomfound.data.whiteboards.findIndex((wbrd) => wbrd.id === WboardId);
+            if (tempWboardIndex != -1) {
+              classroomfound.data.whiteboards[tempWboardIndex] = Wboard;
+              classroomfound.data.markModified('whiteboards');
+              classroomfound.data.save((err, data) => { console.log(err); });
+              return res.status(200).send({ message: "whiteboards editted", Wboard });
+            } else {
+              console.log("err Wboard not found");
+              return res.status(456).send({ message: "Wboard not found" });
+            }
+
+          })
+        })
+    } catch (error) {
+      // Access Denied
+      console.log("err Access Denied   " + error);
+      return res.status(401).send(error);
+    }
+  }
+};
+exports.removeclassWboard = (req, res) => {
+  try {
+    const id = req.userId;
+    User.findOne({ _id: id })
+      .then(user => {
+        if (!user) {
+          return res.status(561).send({ message: "user not found" });
+        }
+        const uuid = req.body.uuid;
+        const WboardId = req.body.WboardId;
+        classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
+          if (err) {
+            console.log('error accured in addclass', err);
+            return res.status(500).send({ message: err });
+          }
+          if (!classroomfound) {
+            return res.status(567).send({ message: "classroom not found" });
+          }
+          if (classroomfound.teacher != req.userId) {
+            return res.status(401).send({ message: "class not yours" });
+          }
+          classroomfound.data.whiteboards = classroomfound.data.whiteboards.filter(wbrd => wbrd.id != WboardId);
+          classroomfound.data.markModified('whiteboards');
+          classroomfound.data.save((err, data) => { console.log(err); });
+          return res.status(200).send({ message: "whiteboards deleted" });
+        })
+      })
+  } catch (error) {
+    // Access Denied
+    console.log("err Access Denied   " + error);
+    return res.status(401).send(error);
+  }
+};
+
 // User.findByIdAndUpdate(id, { $push: { classes: data } },{new: true},(err, user) => {
 //   if (err) {
 //     return res.status(500).send({ message: err });

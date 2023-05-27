@@ -28,5 +28,10 @@ module.exports = function(app,io) {
 // ----------- Meetings (LiveStreams) ------------//
   app.post("/api/teacher/createmeeting",[authJwt.verifyToken,authJwt.isTeacher,refreshToken],controller.createmeeting);
   app.post("/api/teacher/getsignature",[authJwt.verifyToken,authJwt.isTeacher,zoomMidlwares.refreshToken,zoomMidlwares.getzakToken],controller.getsignature);
-  
+
+  //------------------- Wboard -----------------------//
+// app.post("/api/teacher/getclassWboard",[authJwt.verifyToken, authJwt.isTeacher],controller.getclassWboard);
+app.post("/api/teacher/addclassWboard",[authJwt.verifyToken, authJwt.isTeacher],controller.addclassWboard(io));
+app.post("/api/teacher/editclassWboard",[authJwt.verifyToken, authJwt.isTeacher],controller.editclassWboard(io));
+app.post("/api/teacher/removeclassWboard",[authJwt.verifyToken, authJwt.isTeacher],controller.removeclassWboard);  
 };
