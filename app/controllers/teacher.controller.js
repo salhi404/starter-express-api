@@ -656,6 +656,7 @@ exports.createmeeting = (req, res) => {
             let meeting = {
               uuid: res2.data.uuid,
               id: res2.data.id,
+              Wboard: +reqdata.Wboard,
               host_id: res2.data.host_id,
               host_email: res2.data.host_email,
               topic: res2.data.topic,
