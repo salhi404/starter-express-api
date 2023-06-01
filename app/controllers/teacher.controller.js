@@ -657,6 +657,7 @@ exports.createmeeting = (req, res) => {
               uuid: res2.data.uuid,
               id: res2.data.id,
               Wboard: +reqdata.Wboard,
+              peer:reqdata.peer,
               host_id: res2.data.host_id,
               host_email: res2.data.host_email,
               topic: res2.data.topic,
@@ -667,7 +668,7 @@ exports.createmeeting = (req, res) => {
               join_url: res2.data.join_url,
               password: res2.data.password,
               encrypted_password: res2.data.encrypted_password,
-              status: res2.data.status,
+              status: 0,
             }
             classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
               if (err) {
@@ -732,7 +733,6 @@ exports.getsignature = (req, res) => {
         }
         const info = classroomfound.data.livestreams.find(livestream=>livestream.indd==indd);
         if (info) {
-          
           const iat = Math.round(new Date().getTime() / 1000) - 30;
           const exp = iat + 60 * 60 * 2
           const oHeader = { alg: 'HS256', typ: 'JWT' }
@@ -762,7 +762,41 @@ exports.getsignature = (req, res) => {
       })
     })
 }
+exports.startStream = (req, res) => {
 
+  User.findById(req.userId)
+    .then(user => {
+      if (!user) {
+        return res.status(561).send({ message: "user not found" });
+      }
+      const uuid = req.body.params.uuid;
+      const indd = req.body.params.indd;
+      classroom.findOne({ uuid }).populate("data").exec((err, classroomfound) => {
+        if (err) {
+          console.log('error accured in addclass', err);
+          return res.status(500).send({ message: err });
+        }
+        if (!classroomfound) {
+          return res.status(567).send({ message: "classroom not found" });
+        }
+        if (classroomfound.teacher != req.userId) {
+          return res.status(401).send({ message: "class not yours" });
+        }
+        const info = classroomfound.data.livestreams.find(livestream=>livestream.indd==indd);
+        if (info) {
+          info.status=1;
+          info.mode=req.body.params.mode;
+          if(req.body.params.mode==1) info.Wboard=req.body.params.Wboard;
+          classroomfound.data.markModified("livestreams");
+          classroomfound.markModified('data');
+          classroomfound.data.save((err, data) => { console.log(err); });
+          classroomfound.save((err, data) => { console.log(err); });
+          return res.status(200).send({ message:'startStream executed in server' , info })
+        }
+        else {return res.status(568).send({ message:'no info found' , info })}
+      })
+    })
+}
 
 // ----------- Notifications ------------//
 
