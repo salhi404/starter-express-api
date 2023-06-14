@@ -763,7 +763,6 @@ exports.getsignature = (req, res) => {
     })
 }
 exports.startStream = (req, res) => {
-
   User.findById(req.userId)
     .then(user => {
       if (!user) {
@@ -783,15 +782,20 @@ exports.startStream = (req, res) => {
           return res.status(401).send({ message: "class not yours" });
         }
         const info = classroomfound.data.livestreams.find(livestream=>livestream.indd==indd);
+        let whiteboard ;
         if (info) {
           info.status=1;
           info.mode=req.body.params.mode;
-          if(req.body.params.mode==1) info.Wboard=req.body.params.Wboard;
+          
+          if(req.body.params.mode==1){
+            info.Wboard=req.body.params.Wboard;
+             whiteboard =classroomfound.data.whiteboards.find(wb=>wb.id===info.Wboard)
+          } 
           classroomfound.data.markModified("livestreams");
           classroomfound.markModified('data');
           classroomfound.data.save((err, data) => { console.log(err); });
           classroomfound.save((err, data) => { console.log(err); });
-          return res.status(200).send({ message:'startStream executed in server' , info })
+          return res.status(200).send({ message:'startStream executed in server' , info:{...info,whiteboard:whiteboard} })
         }
         else {return res.status(568).send({ message:'no info found' , info })}
       })
