@@ -13,4 +13,6 @@ module.exports = function(app) {
   app.post("/api/students/enroll",[authJwt.verifyToken],controller.enroll);
   app.post("/api/students/getstreams",[authJwt.verifyToken],controller.getstreams);
   app.post("/api/students/getsignature",[authJwt.verifyToken/*,zoomMidlwares.refreshToken,zoomMidlwares.getzakToken*/],controller.getsignature);
+  app.post("/api/students/startStream",[authJwt.verifyToken/*,zoomMidlwares.refreshToken,zoomMidlwares.getzakToken*/],controller.startStream);
 };
+
