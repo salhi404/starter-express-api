@@ -785,6 +785,7 @@ exports.startStream = (req, res) => {
         let whiteboard ;
         if (info) {
           info.status=1;
+        //  info.peer=req.body.params.peer;
           info.mode=req.body.params.mode;
           
           if(req.body.params.mode==1){
